@@ -1,0 +1,2727 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f0a1f">
+<title>TermPilot — Terme &amp; Gleichungen · Klasse 7</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#0e1117;
+    --bg-1:#151a23;
+    --surface:rgba(255,255,255,.04);
+    --surface-2:rgba(255,255,255,.07);
+    --border:rgba(255,255,255,.09);
+    --border-strong:rgba(255,255,255,.16);
+    --text:#f2f0ea;
+    --text-soft:#c4c0b5;
+    --muted:#7d7a70;
+
+    --p1:#a855f7;
+    --p2:#ec4899;
+    --c1:#22d3ee;
+    --gold:#fbbf24;
+    --green:#34d399;
+    --red:#fb7185;
+
+    /* Mathe-Zeichen: warmweiß mit klarem Kontrast */
+    --math-text:#fef6e4;
+    --math-bg:rgba(255,255,255,.06);
+    --math-border:rgba(255,255,255,.14);
+    --op-minus:#ff9b87;   /* klar unterschiedlich vom Plus */
+    --op-plus:#7ee3a8;
+    --op-times:#ffd77a;
+    --op-eq:#c7c0e0;
+
+    --grad-main:linear-gradient(135deg,#a855f7 0%,#ec4899 100%);
+    --grad-cool:linear-gradient(135deg,#22d3ee 0%,#3b82f6 100%);
+    --grad-gold:linear-gradient(135deg,#fbbf24 0%,#f97316 100%);
+    --grad-green:linear-gradient(135deg,#34d399 0%,#10b981 100%);
+  }
+
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    /* schlichter, fast neutraler Dark-Mode — nur ein Hauch Farbe oben */
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 0%, rgba(168,85,247,.08), transparent 70%),
+      linear-gradient(180deg, #0e1117 0%, #11141b 100%);
+    background-attachment:fixed;
+    color:var(--text);
+    font-family:"Outfit",system-ui,-apple-system,sans-serif;
+    font-size:16px;
+    line-height:1.5;
+    min-height:100vh;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .wrap{
+    max-width:780px;margin:0 auto;
+    padding:24px 20px 120px;
+    padding-top:max(24px,env(safe-area-inset-top));
+  }
+
+  /* ============ HEADER ============ */
+  header.top{margin-bottom:28px}
+  .header-row{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+  }
+  .logo{display:flex;align-items:center;gap:12px}
+  .logo-icon{
+    width:44px;height:44px;border-radius:14px;
+    background:var(--grad-main);
+    display:grid;place-items:center;
+    font-weight:800;font-size:22px;color:#fff;
+    box-shadow:0 0 30px rgba(168,85,247,.35);
+  }
+  .logo-text{font-weight:700;font-size:18px;line-height:1.1}
+  .logo-text small{
+    display:block;font-weight:500;font-size:11px;
+    color:var(--muted);text-transform:uppercase;letter-spacing:.12em;
+    margin-top:2px;
+  }
+  .streak{
+    display:flex;align-items:center;gap:6px;
+    background:var(--surface);border:1px solid var(--border);
+    padding:8px 14px;border-radius:999px;
+    font-weight:600;font-size:14px;
+  }
+
+  h1.title{
+    font-size:clamp(28px,7vw,40px);
+    font-weight:800;line-height:1.05;letter-spacing:-.02em;
+    margin:18px 0 6px;
+  }
+  h1.title .grad{
+    background:var(--grad-main);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .subtitle{color:var(--text-soft);font-size:15px;margin:0 0 18px}
+
+  /* ============ Gesamt-Fortschritt ============ */
+  .overall-progress{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:18px;padding:16px 18px;margin-bottom:24px;
+  }
+  .overall-progress .row{
+    display:flex;justify-content:space-between;align-items:center;
+    font-size:13px;color:var(--text-soft);margin-bottom:10px;
+  }
+  .overall-progress .row strong{color:var(--text);font-size:15px;font-weight:700}
+  .progress-bar{
+    height:8px;background:rgba(255,255,255,.08);
+    border-radius:999px;overflow:hidden;
+  }
+  .progress-bar > span{
+    display:block;height:100%;width:0;
+    background:var(--grad-main);
+    border-radius:999px;
+    transition:width .5s ease;
+  }
+
+  /* ============ KAPITEL-LISTE ============ */
+  .view{display:none}
+  .view.active{display:block}
+
+  .section-label{
+    font-size:11px;font-weight:600;text-transform:uppercase;
+    letter-spacing:.15em;color:var(--muted);
+    margin:8px 0 12px;display:flex;align-items:center;gap:10px;
+  }
+  .section-label::after{content:"";flex:1;height:1px;background:var(--border)}
+
+  .chapter-list{display:flex;flex-direction:column;gap:14px}
+  .chapter-card{
+    position:relative;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:22px;
+    padding:18px 20px;
+    cursor:pointer;
+    transition:transform .18s ease, border-color .18s, background .18s;
+    text-align:left;color:inherit;font:inherit;width:100%;
+  }
+  .chapter-card:hover{
+    transform:translateY(-2px);
+    border-color:var(--border-strong);
+    background:var(--surface-2);
+  }
+  .chapter-card:active{transform:translateY(0)}
+  .chapter-card .head{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+  .chapter-card .icon{
+    width:48px;height:48px;border-radius:14px;
+    background:var(--grad);
+    display:grid;place-items:center;
+    font-size:24px;flex-shrink:0;
+  }
+  .chapter-card .meta{flex:1;min-width:0}
+  .chapter-card .num{
+    font-size:11px;font-weight:600;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.12em;
+  }
+  .chapter-card h3{margin:2px 0 0;font-size:18px;font-weight:700;line-height:1.2}
+  .chapter-card .arrow{
+    color:var(--muted);font-size:20px;flex-shrink:0;
+    transition:transform .18s, color .18s;
+  }
+  .chapter-card:hover .arrow{color:var(--text);transform:translateX(4px)}
+  .chapter-card .new-badge{position:absolute;top:12px;right:14px;background:linear-gradient(135deg,#f97316,#fbbf24);color:#1b1b1b;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:3px 10px;border-radius:999px;animation:pulse-badge 2s ease infinite}
+  @keyframes pulse-badge{0%,100%{box-shadow:0 0 0 0 rgba(249,115,22,.5)}50%{box-shadow:0 0 0 8px rgba(249,115,22,0)}}
+  .chapter-card.is-new{border-left:3px solid #f97316}
+  .chapter-card.is-new .icon{box-shadow:0 0 16px rgba(249,115,22,.5)}
+  .chapter-card .progress{margin-top:6px}
+  .chapter-card .progress-bar{height:6px}
+  .chapter-card .progress-bar > span{background:var(--grad)}
+  .chapter-card .progress-text{
+    font-size:12px;color:var(--text-soft);margin-top:6px;
+    display:flex;justify-content:space-between;
+  }
+  .chapter-card .progress-text .done{color:var(--text);font-weight:600}
+
+  /* ============ KAPITEL-DETAIL ============ */
+  .back-btn{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--surface);border:1px solid var(--border);
+    color:var(--text);font:inherit;font-weight:600;font-size:14px;
+    padding:10px 16px;border-radius:999px;cursor:pointer;
+    margin-bottom:18px;
+    transition:background .18s, transform .12s;
+  }
+  .back-btn:hover{background:var(--surface-2);transform:translateX(-2px)}
+
+  .chapter-hero{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:24px;
+    padding:24px;margin-bottom:24px;
+    position:relative;overflow:hidden;
+  }
+  .chapter-hero::before{
+    content:"";position:absolute;inset:0;
+    background:var(--grad);opacity:.10;pointer-events:none;
+  }
+  .chapter-hero .hero-head{
+    display:flex;align-items:center;gap:14px;margin-bottom:14px;
+    position:relative;
+  }
+  .chapter-hero .icon{
+    width:56px;height:56px;border-radius:18px;
+    background:var(--grad);
+    display:grid;place-items:center;
+    font-size:28px;flex-shrink:0;
+  }
+  .chapter-hero .num{
+    font-size:11px;font-weight:600;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.12em;
+  }
+  .chapter-hero h2{
+    margin:2px 0 0;font-size:24px;font-weight:800;line-height:1.15;
+    letter-spacing:-.01em;
+  }
+  .chapter-hero .pages{
+    font-size:11px;font-weight:500;color:var(--muted);margin-top:4px;
+    font-family:"JetBrains Mono",monospace;
+  }
+  .chapter-hero .desc{
+    position:relative;
+    font-size:15px;line-height:1.6;color:var(--text-soft);
+  }
+  .chapter-hero .desc p{margin:0 0 10px}
+  .chapter-hero .desc p:last-child{margin-bottom:0}
+  .chapter-hero .desc em{font-style:normal;font-weight:600;color:var(--text)}
+  .chapter-hero .desc .math{
+    font-family:"JetBrains Mono",monospace;font-size:13.5px;
+    background:var(--math-bg);padding:2px 8px;border-radius:6px;
+    color:var(--math-text);
+    border:1px solid var(--math-border);
+    letter-spacing:.02em;
+  }
+
+  /* ============ AUFGABEN ============ */
+  .tasks-header{
+    display:flex;align-items:center;justify-content:space-between;
+    margin:24px 0 14px;
+  }
+  .tasks-header h3{
+    margin:0;font-size:18px;font-weight:700;
+    display:flex;align-items:center;gap:10px;
+  }
+  .tasks-header h3 .dot{
+    width:8px;height:8px;border-radius:50%;background:var(--grad);
+  }
+  .tasks-header .counter{
+    font-size:13px;color:var(--text-soft);font-weight:600;
+    background:var(--surface);border:1px solid var(--border);
+    padding:6px 12px;border-radius:999px;
+  }
+
+  .task{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:20px;margin-bottom:14px;
+    transition:opacity .25s, border-color .25s;
+    position:relative;
+  }
+  .task.locked{
+    opacity:.4;pointer-events:none;
+  }
+  .task.locked::before{
+    content:"🔒";position:absolute;top:50%;left:50%;
+    transform:translate(-50%,-50%);font-size:32px;
+    z-index:2;
+  }
+  .task.solved{
+    border-color:rgba(52,211,153,.4);
+    background:rgba(52,211,153,.05);
+  }
+  .task.just-solved{animation:pop .4s ease}
+  @keyframes pop{
+    0%{transform:scale(1)}
+    50%{transform:scale(1.015)}
+    100%{transform:scale(1)}
+  }
+
+  .task-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .task-num{
+    width:32px;height:32px;border-radius:10px;
+    background:var(--grad);
+    display:grid;place-items:center;
+    font-weight:800;font-size:15px;color:#fff;
+    flex-shrink:0;
+  }
+  .task.solved .task-num{background:var(--grad-green)}
+  .task-kind{
+    font-size:11px;font-weight:600;color:var(--text-soft);
+    text-transform:uppercase;letter-spacing:.1em;
+    background:rgba(255,255,255,.06);padding:4px 10px;border-radius:999px;
+    border:1px solid var(--border);
+  }
+  .task.solved .task-kind::before{content:"✓ ";color:var(--green)}
+
+  .task-body{
+    font-size:15.5px;line-height:1.6;color:var(--text);
+    margin-bottom:16px;
+  }
+  .task-body .math{
+    font-family:"JetBrains Mono",monospace;font-size:14.5px;font-weight:500;
+    background:var(--math-bg);
+    color:var(--math-text);
+    padding:3px 10px;border-radius:6px;
+    border:1px solid var(--math-border);
+    white-space:nowrap;
+    letter-spacing:.03em;
+  }
+  /* Operatoren farblich hervorheben — bessere Unterscheidung */
+  .task-body .math .op-minus{color:var(--op-minus);font-weight:700}
+  .task-body .math .op-plus{color:var(--op-plus);font-weight:700}
+  .task-body .math .op-times{color:var(--op-times);font-weight:700;padding:0 1px}
+  .task-body .math .op-eq{color:var(--op-eq);font-weight:700;padding:0 2px}
+  .task-body em{font-style:normal;font-weight:600;color:var(--gold)}
+
+  /* ---- Bruchdarstellung ---- */
+  .frac{
+    display:inline-flex;flex-direction:column;align-items:center;
+    vertical-align:middle;margin:0 4px;
+    font-family:"JetBrains Mono",monospace;font-size:14px;font-weight:500;
+    line-height:1;
+  }
+  .frac .num,.frac .den{
+    padding:2px 6px;text-align:center;
+  }
+  .frac .num{
+    border-bottom:2px solid var(--math-text);
+    padding-bottom:3px;
+  }
+  .frac .den{
+    padding-top:3px;
+  }
+  /* In .math-Spans: Farbe erben */
+  .math .frac .num{border-bottom-color:var(--math-text)}
+  /* In Lösungsbox / Memo: etwas kleiner */
+  .solution-box .frac,.memo .frac{font-size:13px}
+  .tip-box .frac{font-size:13px}
+  .task-body figure{
+    margin:14px 0;text-align:center;
+    background:rgba(255,255,255,.03);
+    border:1px solid var(--border);
+    border-radius:12px;padding:14px;
+  }
+  .task-body figure svg{max-width:100%;height:auto}
+  .task-body .hint-line{
+    display:block;font-size:13px;color:var(--muted);
+    margin-top:8px;font-style:italic;
+  }
+
+  /* ---- Versteckte Gleichung (Rätsel) ---- */
+  .eq-reveal{margin-top:12px}
+  .eq-reveal .btn-reveal{
+    background:rgba(34,211,238,.10);color:var(--c1);
+    border:1px solid rgba(34,211,238,.30);font-size:13px;padding:10px 16px;
+    border-radius:10px;cursor:pointer;font-family:inherit;font-weight:600;
+    transition:background .15s;display:inline-flex;align-items:center;gap:6px;
+  }
+  .eq-reveal .btn-reveal:hover{background:rgba(34,211,238,.20)}
+  .eq-reveal .eq-content{
+    margin-top:10px;
+    background:rgba(34,211,238,.06);
+    border:1px solid rgba(34,211,238,.25);
+    border-radius:10px;padding:14px 18px;
+    text-align:center;font-size:18px;
+    animation:slide-in .25s ease;
+  }
+
+  .answer-area{
+    background:rgba(0,0,0,.20);
+    border:1px solid var(--border);
+    border-radius:14px;padding:14px;
+  }
+  .answer-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .answer-row + .answer-row{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+  .answer-row .label{
+    font-size:11px;font-weight:600;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.1em;
+    width:100%;margin-bottom:4px;
+  }
+  .answer-row input[type="text"]{
+    flex:1;min-width:140px;
+    font-family:"JetBrains Mono",monospace;font-size:16px;font-weight:500;
+    background:rgba(255,255,255,.06);
+    border:1.5px solid var(--border-strong);
+    color:var(--text);
+    padding:12px 14px;border-radius:10px;outline:none;
+    transition:border-color .15s, background .15s;
+  }
+  .answer-row input[type="text"]::placeholder{color:var(--muted)}
+  .answer-row input[type="text"]:focus{
+    border-color:var(--p1);
+    background:rgba(168,85,247,.08);
+  }
+  .answer-row input.bad{
+    border-color:var(--red);
+    background:rgba(251,113,133,.08);
+    animation:shake .35s;
+  }
+  .answer-row input.good{
+    border-color:var(--green);
+    background:rgba(52,211,153,.10);
+  }
+  @keyframes shake{
+    0%,100%{transform:none}
+    25%{transform:translateX(-5px)}
+    75%{transform:translateX(5px)}
+  }
+
+  .btn{
+    font-family:inherit;font-weight:700;font-size:14px;
+    border:none;cursor:pointer;
+    padding:12px 18px;border-radius:10px;
+    transition:transform .1s, opacity .15s;
+    display:inline-flex;align-items:center;gap:6px;
+    white-space:nowrap;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn:disabled{cursor:not-allowed;opacity:.5}
+
+  .btn.check{background:var(--grad-main);color:#fff}
+  .btn.tip{
+    background:var(--surface-2);color:var(--gold);
+    border:1px solid rgba(251,191,36,.3);
+  }
+
+  /* ---- Lösungsbutton ---- */
+  .btn.solve{
+    background:rgba(251,113,133,.10);color:var(--red);
+    border:1px solid rgba(251,113,133,.25);font-size:12px;padding:10px 14px;
+  }
+  .btn.solve:hover:not(:disabled){background:rgba(251,113,133,.20)}
+
+  /* ---- Lösungsbox ---- */
+  .solution-box{
+    margin-top:14px;
+    background:linear-gradient(135deg,rgba(251,113,133,.06),rgba(168,85,247,.04));
+    border:1px solid rgba(251,113,133,.20);
+    border-radius:14px;
+    padding:18px;
+    animation:slide-in .3s ease;
+  }
+  .solution-box .sol-header{
+    display:flex;align-items:center;gap:10px;margin-bottom:14px;
+  }
+  .solution-box .sol-icon{
+    width:32px;height:32px;border-radius:10px;
+    background:linear-gradient(135deg,var(--red),#f97316);
+    display:grid;place-items:center;font-size:16px;flex-shrink:0;
+  }
+  .solution-box .sol-title{
+    font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+    color:var(--red);font-family:"JetBrains Mono",monospace;
+  }
+  .solution-box .sol-answer{
+    background:rgba(0,0,0,.25);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:10px;
+    padding:14px 16px;
+    margin-bottom:12px;
+    font-family:"JetBrains Mono",monospace;
+    font-size:16px;font-weight:700;
+    color:var(--math-text);
+    letter-spacing:.03em;
+    text-align:center;
+  }
+  .solution-box .sol-explain{
+    font-size:13.5px;line-height:1.6;
+    color:var(--text-soft);
+    padding:10px 0 0;
+    border-top:1px solid rgba(255,255,255,.06);
+  }
+  .solution-box .sol-explain .step{
+    display:flex;gap:8px;align-items:baseline;margin-bottom:4px;
+  }
+  .solution-box .sol-explain .step-arrow{
+    color:var(--gold);font-weight:700;flex-shrink:0;
+  }
+  .solution-box .sol-explain .math{
+    font-family:"JetBrains Mono",monospace;font-size:13px;
+    background:rgba(0,0,0,.3);color:var(--math-text);
+    padding:2px 7px;border-radius:5px;
+  }
+
+  .feedback{
+    width:100%;font-size:13px;font-weight:600;margin-top:8px;
+    min-height:18px;
+  }
+  .feedback.ok{color:var(--green)}
+  .feedback.bad{color:var(--red)}
+
+  .tip-cooldown{
+    width:100%;font-family:"JetBrains Mono",monospace;
+    font-size:11px;color:var(--muted);margin-top:4px;
+  }
+
+  .tips{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+  .tip-box{
+    background:rgba(251,191,36,.08);
+    border:1px solid rgba(251,191,36,.25);
+    border-left:3px solid var(--gold);
+    padding:12px 14px;border-radius:10px;
+    font-size:14px;line-height:1.5;color:var(--text-soft);
+    animation:slide-in .25s ease;
+  }
+  .tip-box .label{
+    display:block;font-family:"JetBrains Mono",monospace;font-size:10px;
+    color:var(--gold);text-transform:uppercase;letter-spacing:.12em;
+    font-weight:700;margin-bottom:4px;
+  }
+  @keyframes slide-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+  /* ============ Long-Form Hint ============ */
+  .long-hint-box{
+    margin-top:12px;
+    background:rgba(34,211,238,.06);
+    border:1px solid rgba(34,211,238,.30);
+    border-radius:14px;padding:14px 16px;
+    animation:slide-in .25s ease;
+  }
+  .long-hint-head{
+    display:flex;gap:10px;align-items:flex-start;
+    font-size:14px;line-height:1.5;color:var(--text-soft);
+    margin-bottom:10px;
+  }
+  .long-hint-head strong{color:var(--text);display:block;margin-bottom:2px}
+  .long-hint-icon{font-size:18px;flex-shrink:0}
+  .long-hint-box .show-steps{
+    background:rgba(34,211,238,.15);
+    color:var(--c1);
+    border:1px solid rgba(34,211,238,.35);
+    font-size:12px;padding:8px 14px;
+  }
+  .steps-list{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+  .step-item{
+    display:flex;gap:10px;align-items:flex-start;
+    background:rgba(0,0,0,.25);
+    padding:10px 12px;border-radius:8px;
+    font-size:13.5px;line-height:1.5;color:var(--text-soft);
+  }
+  .step-num{
+    width:22px;height:22px;border-radius:50%;
+    background:var(--grad-cool);color:#fff;
+    display:grid;place-items:center;font-weight:700;font-size:12px;
+    flex-shrink:0;
+  }
+
+  /* ============ MERKKASTEN ============ */
+  .memo{
+    margin-top:32px;
+    background:rgba(34,211,238,.06);
+    border:1px solid rgba(34,211,238,.30);
+    border-radius:20px;
+    padding:24px;position:relative;
+  }
+  .memo .badge{
+    display:inline-flex;align-items:center;gap:6px;
+    background:var(--grad-cool);color:#fff;
+    padding:6px 14px;border-radius:999px;
+    font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+    margin-bottom:14px;
+  }
+  .memo h3{
+    margin:0 0 12px;font-size:20px;font-weight:800;
+    color:var(--text);letter-spacing:-.01em;
+  }
+  .memo p{
+    margin:0 0 10px;font-size:14.5px;line-height:1.65;
+    color:var(--text-soft);
+  }
+  .memo p strong{color:var(--text);font-weight:700}
+  .memo .math{
+    font-family:"JetBrains Mono",monospace;font-size:13.5px;font-weight:500;
+    background:rgba(0,0,0,.35);
+    color:var(--math-text);
+    padding:3px 9px;border-radius:6px;
+    border:1px solid var(--math-border);
+    white-space:nowrap;
+    letter-spacing:.03em;
+  }
+  .memo .math .op-minus{color:var(--op-minus);font-weight:700}
+  .memo .math .op-plus{color:var(--op-plus);font-weight:700}
+  .memo .math .op-times{color:var(--op-times);font-weight:700;padding:0 1px}
+  .memo .math .op-eq{color:var(--op-eq);font-weight:700;padding:0 2px}
+  .memo .math-block{
+    display:block;font-family:"JetBrains Mono",monospace;font-size:13.5px;
+    background:rgba(0,0,0,.40);color:var(--math-text);
+    padding:14px 16px;border-radius:10px;margin:10px 0;
+    white-space:pre-wrap;line-height:1.75;
+    border-left:3px solid var(--math-border);
+    letter-spacing:.03em;
+  }
+  .memo ol, .memo ul{
+    margin:8px 0;padding-left:22px;color:var(--text-soft);
+  }
+  .memo li{margin-bottom:6px;font-size:14.5px;line-height:1.6}
+  .memo em{font-style:normal;font-weight:600;color:var(--gold)}
+
+  /* ============ ABSCHLUSS-BANNER ============ */
+  .complete-banner{
+    margin-top:24px;
+    background:var(--grad-green);
+    border-radius:20px;padding:24px;text-align:center;
+    color:#fff;display:none;
+    animation:bounce-in .5s cubic-bezier(.34,1.56,.64,1);
+  }
+  .complete-banner.show{display:block}
+  .complete-banner .emoji{font-size:42px;display:block;margin-bottom:8px}
+  .complete-banner h4{
+    margin:0 0 6px;font-size:22px;font-weight:800;letter-spacing:-.01em;
+  }
+  .complete-banner p{margin:0;font-size:14px;opacity:.92}
+  @keyframes bounce-in{
+    0%{opacity:0;transform:scale(.9)}
+    60%{opacity:1;transform:scale(1.02)}
+    100%{transform:scale(1)}
+  }
+
+  /* ============ Test-Auswertung ============ */
+  .test-result{margin-top:18px}
+  .test-summary{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:20px;padding:28px 24px;
+    text-align:center;
+    animation:bounce-in .5s cubic-bezier(.34,1.56,.64,1);
+  }
+  .ts-emoji{font-size:54px;margin-bottom:8px}
+  .ts-score{
+    font-size:42px;font-weight:800;line-height:1;
+    background:var(--grad-gold);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .ts-pct{
+    font-family:"JetBrains Mono",monospace;font-size:14px;
+    color:var(--text-soft);margin-top:6px;
+  }
+  .ts-label{
+    margin-top:12px;font-size:16px;font-weight:600;color:var(--text);
+  }
+  .ts-wrong{
+    margin-top:20px;padding-top:18px;border-top:1px solid var(--border);
+    text-align:left;font-size:14px;color:var(--text-soft);
+  }
+  .ts-wrong strong{color:var(--text);display:block;margin-bottom:8px}
+  .ts-wrong ul{margin:0;padding-left:20px}
+  .ts-wrong li{margin-bottom:4px}
+  .ts-wrong em{color:var(--gold);font-style:normal;font-weight:600}
+
+  .submit-test{
+    width:100%;margin-top:18px;padding:18px;
+    font-size:16px;border-radius:14px;
+    background:var(--grad-gold);color:#1b1b1b;font-weight:800;
+  }
+
+  /* ============ Confetti (Canvas) ============ */
+  #confetti-canvas{
+    position:fixed;inset:0;pointer-events:none;z-index:9999;
+  }
+
+  footer{
+    margin-top:48px;text-align:center;
+    font-size:11px;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.12em;font-weight:500;
+  }
+
+  @media (max-width:480px){
+    .wrap{padding:18px 14px 100px}
+    h1.title{font-size:26px}
+    .chapter-hero{padding:20px}
+    .chapter-hero h2{font-size:20px}
+    .task{padding:16px}
+    .memo{padding:20px}
+    .answer-row input[type="text"]{font-size:15px;padding:11px 12px}
+    .btn{padding:11px 14px;font-size:13px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="header-row">
+      <div class="logo">
+        <div class="logo-icon">∑</div>
+        <div class="logo-text">
+          TermPilot
+          <small>Klasse 7 · Algebra</small>
+        </div>
+      </div>
+      <div class="streak" id="streak">
+        <span>⚡</span>
+        <span id="streak-count">0</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="view active" id="view-home">
+    <h1 class="title">Terme &amp; <span class="grad">Gleichungen</span></h1>
+    <p class="subtitle">Acht Stationen plus Abschluss-Test. Alle Aufgaben sind sofort zugänglich.</p>
+
+    <div class="overall-progress">
+      <div class="row">
+        <span>Dein Fortschritt</span>
+        <strong><span id="overall-done">0</span> / <span id="overall-total">0</span></strong>
+      </div>
+      <div class="progress-bar"><span id="overall-bar"></span></div>
+    </div>
+
+    <div class="section-label">Lernstationen</div>
+    <div class="chapter-list" id="chapter-list"></div>
+
+    <footer>Lernapp · Antworten lokal geprüft</footer>
+  </div>
+
+  <div class="view" id="view-chapter">
+    <button class="back-btn" id="back-btn">← Zurück</button>
+    <div id="chapter-content"></div>
+    <footer>Lösungsbutton erscheint nach allen Tipps · Tipps schubsen, verraten nichts</footer>
+  </div>
+
+</div>
+
+<canvas id="confetti-canvas"></canvas>
+
+<script>
+'use strict';
+
+/* =====================================================================
+   ANTWORT-PRÜFUNG: Term-Auswerter & Vergleich
+   ===================================================================== */
+function normalize(str){
+  if(str==null) return '';
+  let s = String(str).toLowerCase().trim();
+  s = s.replace(/[\u2212\u2013\u2014]/g,'-');
+  s = s.replace(/[\u00b7\u00d7]/g,'*');
+  s = s.replace(/,/g,'.');
+  s = s.replace(/\s+/g,'');
+  return s;
+}
+
+function parseNumberLike(s){
+  s = normalize(s);
+  s = s.replace(/^\((-?\d+(?:\.\d+)?)\)$/, '$1');
+  if(/^-?\d+(\.\d+)?$/.test(s)) return parseFloat(s);
+  const m = s.match(/^(-?\d+(?:\.\d+)?)\/(-?\d+(?:\.\d+)?)$/);
+  if(m){
+    const den = parseFloat(m[2]);
+    if(den === 0) return null;
+    return parseFloat(m[1])/den;
+  }
+  return null;
+}
+
+function tokenize(src, varNames){
+  const s = normalize(src);
+  const tokens = [];
+  let i = 0;
+  while(i < s.length){
+    const c = s[i];
+    if('+-*/()'.indexOf(c) >= 0){tokens.push({t:c}); i++; continue}
+    if(/\d/.test(c) || (c==='.' && /\d/.test(s[i+1]))){
+      let j = i;
+      while(j < s.length && /[\d.]/.test(s[j])) j++;
+      tokens.push({t:'num', v:parseFloat(s.slice(i,j))});
+      i = j; continue;
+    }
+    if(/[a-z]/.test(c)){
+      let j = i;
+      while(j < s.length && /[a-z]/.test(s[j])) j++;
+      const name = s.slice(i,j);
+      if(varNames.indexOf(name) >= 0){
+        tokens.push({t:'var', v:name});
+        i = j; continue;
+      }
+      return null;
+    }
+    return null;
+  }
+  const out = [];
+  for(let k = 0; k < tokens.length; k++){
+    const cur = tokens[k];
+    if(k > 0){
+      const prev = tokens[k-1];
+      const prevEndsValue = (prev.t==='num'||prev.t==='var'||prev.t===')');
+      const curStartsValue = (cur.t==='num'||cur.t==='var'||cur.t==='(');
+      if(prevEndsValue && curStartsValue) out.push({t:'*'});
+    }
+    out.push(cur);
+  }
+  return out;
+}
+
+function evalTerm(src, env, varNames){
+  const tokens = tokenize(src, varNames);
+  if(!tokens) return null;
+  let pos = 0;
+  function peek(){return tokens[pos]}
+  function eat(t){const tk = tokens[pos]; if(!tk||tk.t!==t) return null; pos++; return tk}
+  function parseExpr(){
+    let v = parseTerm();
+    if(v===null) return null;
+    while(peek() && (peek().t==='+'||peek().t==='-')){
+      const op = peek().t; pos++;
+      const r = parseTerm();
+      if(r===null) return null;
+      v = (op==='+') ? v+r : v-r;
+    }
+    return v;
+  }
+  function parseTerm(){
+    let v = parseFactor();
+    if(v===null) return null;
+    while(peek() && (peek().t==='*'||peek().t==='/')){
+      const op = peek().t; pos++;
+      const r = parseFactor();
+      if(r===null) return null;
+      if(op==='*') v = v*r;
+      else { if(r===0) return null; v = v/r; }
+    }
+    return v;
+  }
+  function parseFactor(){
+    let sign = 1;
+    while(peek() && (peek().t==='+'||peek().t==='-')){
+      if(peek().t==='-') sign = -sign;
+      pos++;
+    }
+    const v = parsePrimary();
+    if(v===null) return null;
+    return sign*v;
+  }
+  function parsePrimary(){
+    const tk = peek();
+    if(!tk) return null;
+    if(tk.t==='num'){pos++; return tk.v}
+    if(tk.t==='var'){pos++; return env[tk.v] != null ? env[tk.v] : 0}
+    if(tk.t==='('){
+      pos++;
+      const v = parseExpr();
+      if(v===null) return null;
+      if(!eat(')')) return null;
+      return v;
+    }
+    return null;
+  }
+  const result = parseExpr();
+  if(pos !== tokens.length) return null;
+  return result;
+}
+
+function termsEquivalent(input, expected, varNames){
+  const testValues = [0, 1, 2, 3, -1, -2, 0.5, 7, -3.5, 4.25];
+  for(let i = 0; i < testValues.length; i++){
+    const env = {};
+    for(let k = 0; k < varNames.length; k++){
+      env[varNames[k]] = testValues[(i+k) % testValues.length];
+    }
+    const a = evalTerm(input, env, varNames);
+    const b = evalTerm(expected, env, varNames);
+    if(a===null || b===null) return false;
+    if(Math.abs(a - b) > 1e-9) return false;
+  }
+  return true;
+}
+
+/* Extrahiert alle Buchstabenfolgen, die in src als Variable verwendet werden
+   (also nicht direkt Teil eines Schlüsselwortes wie 'ja' sind).
+   Gibt eine sortierte Liste eindeutiger Namen zurück. */
+function extractVarNames(src){
+  const s = normalize(src);
+  const matches = s.match(/[a-z]+/g);
+  if(!matches) return [];
+  const set = {};
+  for(let i = 0; i < matches.length; i++) set[matches[i]] = true;
+  return Object.keys(set);
+}
+
+/* Versucht Term-Äquivalenz auch dann zu bestätigen, wenn die SuS einen anderen
+   Variablennamen verwendet haben (z.B. x statt w). Das funktioniert nur, wenn
+   die Anzahl der verwendeten "Variablen" zu der erwarteten passt. */
+function termsEquivalentFlexible(input, expected, expectedVars){
+  // 1. Direkter Versuch
+  if(termsEquivalent(input, expected, expectedVars)) return true;
+  // 2. Variablen aus der Eingabe extrahieren
+  const inputVars = extractVarNames(input);
+  if(inputVars.length === 0) return false;
+  // Falls zu viele Variablen im Input vorkommen → keine Umbenennung möglich
+  if(inputVars.length !== expectedVars.length) return false;
+  // 3. Umbenennen: jede inputVar → entsprechende expectedVar
+  // Bei einer Variable ist die Zuordnung eindeutig
+  if(expectedVars.length === 1){
+    const from = inputVars[0];
+    const to = expectedVars[0];
+    if(from === to) return false; // schon getestet
+    // Ersetze in input alle Vorkommen von 'from' durch 'to'
+    const renamed = renameVariable(input, from, to);
+    return termsEquivalent(renamed, expected, expectedVars);
+  }
+  // Bei mehreren Variablen: alle Permutationen probieren (selten gebraucht)
+  const perms = permutations(inputVars);
+  for(let p = 0; p < perms.length; p++){
+    let renamed = input;
+    // Mehrstufiges Umbenennen über Platzhalter, damit Tausch funktioniert
+    for(let k = 0; k < perms[p].length; k++){
+      renamed = renameVariable(renamed, perms[p][k], '__v'+k+'__');
+    }
+    for(let k = 0; k < expectedVars.length; k++){
+      renamed = renamed.replace(new RegExp('__v'+k+'__','g'), expectedVars[k]);
+    }
+    if(termsEquivalent(renamed, expected, expectedVars)) return true;
+  }
+  return false;
+}
+
+function renameVariable(src, from, to){
+  // Ersetze nur ganze Wort-Vorkommen
+  const re = new RegExp('(^|[^a-z])' + from + '(?![a-z])', 'g');
+  return src.replace(re, '$1' + to);
+}
+
+function permutations(arr){
+  if(arr.length <= 1) return [arr];
+  const out = [];
+  for(let i = 0; i < arr.length; i++){
+    const rest = arr.slice(0,i).concat(arr.slice(i+1));
+    const subs = permutations(rest);
+    for(let j = 0; j < subs.length; j++) out.push([arr[i]].concat(subs[j]));
+  }
+  return out;
+}
+
+function isLongForm(input, varNames){
+  const s = normalize(input);
+  for(let i = 0; i < varNames.length; i++){
+    const v = varNames[i];
+    const re = new RegExp('(^|[+\\-*/(])' + v + '(?=$|[+\\-*/)])','g');
+    const matches = s.match(re);
+    if(matches && matches.length >= 2) return true;
+  }
+  const numSums = s.match(/(?:^|[+\-])\d+(?:\.\d+)?(?=[+\-]|$)/g);
+  if(numSums && numSums.length >= 3) return true;
+  return false;
+}
+
+function checkAnswer(input, expected){
+  const u = normalize(input);
+  if(!u) return {ok:false};
+
+  if(typeof expected === 'string'){
+    if(normalize(expected) === u) return {ok:true};
+    const a = parseNumberLike(input);
+    const b = parseNumberLike(expected);
+    if(a!==null && b!==null && Math.abs(a-b) < 1e-6) return {ok:true};
+    return {ok:false};
+  }
+
+  if(Array.isArray(expected)){
+    for(let i = 0; i < expected.length; i++){
+      if(normalize(expected[i]) === u) return {ok:true};
+    }
+    const a = parseNumberLike(input);
+    if(a !== null){
+      for(let i = 0; i < expected.length; i++){
+        const b = parseNumberLike(expected[i]);
+        if(b !== null && Math.abs(a-b) < 1e-6) return {ok:true};
+      }
+    }
+    return {ok:false};
+  }
+
+  if(expected && typeof expected === 'object'){
+    if('num' in expected){
+      const v = parseNumberLike(input);
+      if(v===null) return {ok:false};
+      return {ok: Math.abs(v - expected.num) < 1e-6};
+    }
+    if('term' in expected){
+      const vars = expected.vars || ['x'];
+      // Sonderfall: Eingabe enthält "=" → als Gleichung interpretieren
+      // Beispiel: erwartet "n+3", User schreibt "x=n+3" oder "x-3=n"
+      // Wir prüfen, ob (lhs)-(rhs) bzw. (rhs)-(lhs) zu (extraVar)-(expected.term) äquivalent ist.
+      if(input.indexOf('=') >= 0){
+        const parts = input.split('=');
+        if(parts.length === 2 && parts[0].trim() && parts[1].trim()){
+          const inputVars = extractVarNames(input);
+          const extraVars = inputVars.filter(v => vars.indexOf(v) < 0);
+          const lhs = parts[0], rhs = parts[1];
+          const c1 = `(${lhs})-(${rhs})`;
+          const c2 = `(${rhs})-(${lhs})`;
+
+          // Fall A: User hat die Original-Variable verwendet, plus eine "neue Größe" (extraVars=[neueGröße])
+          if(extraVars.length <= 1){
+            const allVars = vars.concat(extraVars);
+            const target = extraVars.length === 1
+              ? `(${extraVars[0]})-(${expected.term})`
+              : `0-(${expected.term})`;
+            if(termsEquivalentFlexible(c1, target, allVars) ||
+               termsEquivalentFlexible(c2, target, allVars)){
+              return {ok:true};
+            }
+            return {ok:false};
+          }
+
+          // Fall B: User hat zwei "fremde" Variablen verwendet — eine ist die umbenannte
+          // Hauptvariable, die andere die "neue Größe". Beide Zuordnungen probieren.
+          if(extraVars.length === 2 && vars.length === 1){
+            for(let pick = 0; pick < 2; pick++){
+              const mainSubst = extraVars[pick];        // wird zu vars[0]
+              const newSize  = extraVars[1-pick];        // ist die "neue Größe"
+              // Eingabe umbenennen: mainSubst → vars[0]
+              const renLhs = renameVariable(lhs, mainSubst, vars[0]);
+              const renRhs = renameVariable(rhs, mainSubst, vars[0]);
+              const allVars = [vars[0], newSize];
+              const target = `(${newSize})-(${expected.term})`;
+              const cc1 = `(${renLhs})-(${renRhs})`;
+              const cc2 = `(${renRhs})-(${renLhs})`;
+              if(termsEquivalent(cc1, target, allVars) ||
+                 termsEquivalent(cc2, target, allVars)){
+                return {ok:true};
+              }
+            }
+            return {ok:false};
+          }
+          return {ok:false};
+        }
+      }
+      if(!termsEquivalentFlexible(input, expected.term, vars)) return {ok:false};
+      const isLong = isLongForm(input, extractVarNames(input).length ? extractVarNames(input) : vars);
+      const compactNorm = normalize(expected.compact || expected.term);
+      // Beim Vergleich für "kompakt" auch flexibel: input umbenannt → kompakt vergleichen
+      let userNorm = u;
+      const inputVars = extractVarNames(input);
+      if(inputVars.length === vars.length && inputVars.length === 1 && inputVars[0] !== vars[0]){
+        userNorm = normalize(renameVariable(input, inputVars[0], vars[0]));
+      }
+      if(isLong && userNorm !== compactNorm){
+        return {ok:true, longHint:true, compact: expected.compact || expected.term, steps: expected.steps};
+      }
+      return {ok:true};
+    }
+    if('any' in expected){
+      for(let i = 0; i < expected.any.length; i++){
+        const r = checkAnswer(input, expected.any[i]);
+        if(r.ok) return r;
+      }
+      return {ok:false};
+    }
+  }
+  return {ok:false};
+}
+
+/* =====================================================================
+   KAPITEL-DATEN
+   ===================================================================== */
+const CHAPTERS = [
+{
+  id:'k1',
+  title:'Terme mit einer Variablen',
+  pages:'Buch S. 124–128',
+  icon:'🔤',
+  grad:'linear-gradient(135deg,#a855f7,#ec4899)',
+  description:`
+    <p>Ein <em>Term mit einer Variablen</em> ist eine Rechenvorschrift, in der ein Buchstabe (z.B.
+    <span class="math">x</span>, <span class="math">w</span>, <span class="math">n</span>) für eine
+    beliebige Zahl steht. Setzt du eine konkrete Zahl ein, kannst du den <em>Wert des Terms</em>
+    berechnen.</p>
+    <p>In dieser Station lernst du, wie man Terme zu einer Situation <em>aufstellt</em> (z.B. „Tim
+    spart 103 € + 2,50 € pro Woche" → <span class="math">103 + w · 2,50</span>) und für verschiedene
+    Zahlen ihren Wert berechnet — auch für negative Zahlen und Brüche.</p>
+  `,
+  tasks:[
+    {
+      kind:'Wert berechnen',
+      body:`Berechne den Wert des Terms <span class="math">4·x − 2</span> für <span class="math">x = 5</span>.`,
+      answer:'18',
+      tips:[
+        `Setze die Zahl 5 anstelle von x ein. Schreibe es ruhig erst hin: 4 · 5 − 2.`,
+        `Punkt vor Strich! Erst 4 · 5 ausrechnen, dann erst die 2 abziehen.`
+      ],
+      solution:`<span class="math">18</span>. Rechnung: 4 · 5 − 2 = 20 − 2 = 18.`
+    },
+    {
+      kind:'Wert berechnen',
+      body:`Berechne den Wert von <span class="math">5 + 3·x</span> für <span class="math">x = −2</span>.`,
+      answer:{num:-1},
+      tips:[
+        `Bei negativen Zahlen am besten Klammern setzen: 5 + 3 · (−2).`,
+        `3 · (−2) = −6. Dann steht da 5 + (−6) — also dasselbe wie 5 − 6.`
+      ],
+      solution:`<span class="math">−1</span>. Rechnung: 5 + 3 · (−2) = 5 − 6 = −1.`
+    },
+    {
+      kind:'Wert berechnen',
+      body:`Berechne den Wert von <span class="math">0,5·x − 10</span> für <span class="math">x = 4</span>.`,
+      answer:{num:-8},
+      tips:[
+        `0,5 · 4 ist genau die Hälfte von 4.`,
+        `0,5 · 4 = 2. Jetzt nur noch 2 − 10 ausrechnen.`
+      ],
+      solution:`<span class="math">−8</span>. Rechnung: 0,5 · 4 − 10 = 2 − 10 = −8.`
+    },
+    {
+      kind:'Term aufstellen',
+      body:`Sei <span class="math">n</span> eine natürliche Zahl. Schreibe einen Term (also eine Rechenvorschrift mit n), der die Zahl beschreibt, die <em>um 3 größer</em> ist als <span class="math">n</span>.`,
+      answer:{term:'n+3', vars:['n']},
+      tips:[
+        `"Größer als n" heißt: zu n etwas dazuaddieren.`,
+        `"Um 3 größer" → genau die Zahl 3 dazuzählen.`
+      ],
+      solution:`<span class="math">n + 3</span>. „Um 3 größer" heißt: + 3.`
+    },
+    {
+      kind:'Term aufstellen',
+      body:`Sei <span class="math">n</span> eine natürliche Zahl. Schreibe einen Term, der <em>das Dreifache</em> (also 3-mal so viel) von <span class="math">n</span> beschreibt.`,
+      answer:{term:'3*n', compact:'3·n', vars:['n'],
+        steps:[
+          `"Dreifach" bedeutet "drei davon": n + n + n.`,
+          `Drei gleiche Summanden kann man zu einem Produkt zusammenfassen: n + n + n = 3 · n.`,
+          `Steht die Variable hinter der Zahl, darf das Mal-Zeichen weggelassen werden: 3 · n = 3n.`
+        ]
+      },
+      tips:[
+        `"Dreifach" heißt: dreimal so viel.`,
+        `Du kannst es ausführlich als n + n + n schreiben — oder kompakter als 3 · n.`
+      ],
+      solution:`<span class="math">3 · n</span> (kurz: 3n). Dreifach = 3 mal.`
+    },
+    {
+      kind:'Sachaufgabe',
+      body:`Rebecca hat 45 € im Sparschwein. Jede Woche kommen 3,50 € dazu. Stelle einen Term auf,
+      mit dem man das Ersparte nach <span class="math">w</span> Wochen berechnen kann.`,
+      answer:{term:'45+3.5*w', compact:'45+3,5·w', vars:['w'],
+        steps:[
+          `Beispielhaft mitdenken: Nach 1 Woche → 45 + 3,50. Nach 2 Wochen → 45 + 3,50 + 3,50. Nach 3 Wochen → 45 + 3,50 + 3,50 + 3,50.`,
+          `Statt 3,50 immer wieder dazuzuschreiben: w · 3,50 (das ist w-mal 3,50).`,
+          `Kompakt: 45 + 3,50 · w   bzw.   45 + 3,5 · w.`
+        ]
+      },
+      tips:[
+        `Was bleibt gleich, was verändert sich? Die 45 € sind immer da. Pro Woche kommen 3,50 € dazu.`,
+        `Nach w Wochen sind insgesamt w · 3,50 € dazugekommen. Das musst du nur noch zur 45 dazuaddieren.`
+      ],
+      solution:`<span class="math">45 + 3,50 · w</span>. Startgeld + pro Woche · Anzahl.`
+    },
+    {
+      kind:'Sachaufgabe',
+      body:`Eine Snowboard-Ausleihe kostet <span class="math">27 €</span> Grundgebühr und zusätzlich
+      <span class="math">22,50 €</span> pro Tag. Stelle einen Term für die Gesamtgebühr nach
+      <span class="math">t</span> Tagen auf.`,
+      answer:{term:'27+22.5*t', compact:'27+22,5·t', vars:['t'],
+        steps:[
+          `Mitdenken mit kleinen Tagen-Zahlen: nach 1 Tag → 27 + 22,50; nach 2 Tagen → 27 + 22,50 + 22,50; usw.`,
+          `Die 22,50 wiederholt sich t-mal: also t · 22,50.`,
+          `Kompakter Term: 27 + 22,50 · t   bzw.   27 + 22,5 · t.`
+        ]
+      },
+      tips:[
+        `Die 27 € fallen einmalig an — egal wie viele Tage. Die 22,50 € sind pro Tag.`,
+        `Bei t Tagen also: t · 22,50. Plus die 27 € Grundgebühr.`
+      ],
+      solution:`<span class="math">27 + 22,50 · t</span>. Grundgebühr + Tagespreis · Tage.`
+    },
+    {
+      kind:'Geometrie',
+      body:`Ein Rechteck hat die Seitenlängen <span class="math">x</span> (lang) und
+      <span class="math">3</span> (kurz). Stelle einen Term für den <em>Umfang</em> des Rechtecks auf.
+      <figure>
+        <svg viewBox="0 0 240 110" width="220">
+          <rect x="20" y="20" width="200" height="60" fill="rgba(168,85,247,.15)" stroke="#a855f7" stroke-width="2" rx="4"/>
+          <text x="120" y="14" text-anchor="middle" fill="#f4f1ff" font-family="JetBrains Mono" font-size="14">x</text>
+          <text x="228" y="55" text-anchor="start" fill="#f4f1ff" font-family="JetBrains Mono" font-size="14">3</text>
+        </svg>
+      </figure>`,
+      answer:{term:'2*x+6', compact:'2·x+6', vars:['x'],
+        steps:[
+          `Ausführlich: alle vier Seiten addieren → x + 3 + x + 3.`,
+          `Sortieren: x + x + 3 + 3.`,
+          `x + x = 2·x   und   3 + 3 = 6 → Term: 2·x + 6.`,
+          `Alternativ kann man auch ausklammern: 2 · (x + 3).`
+        ]
+      },
+      tips:[
+        `Ein Rechteck hat 4 Seiten — zwei lange und zwei kurze. Addiere alle vier Seiten.`,
+        `x + 3 + x + 3 = … Fasse die x-e zusammen und die Zahlen zusammen.`
+      ],
+      solution:`<span class="math">2x + 6</span>. Umfang = x + 3 + x + 3 = 2x + 6.`
+    }
+  ],
+  memo:`
+    <h3>Terme mit einer Variablen — so geht's</h3>
+    <p>Ein <strong>Term mit Variable</strong> wie <span class="math">2 + 5 · x</span> ist eine
+    Rechenvorschrift mit einem Buchstaben statt einer festen Zahl. Setzt du eine Zahl für die Variable
+    ein, erhältst du den <strong>Wert des Terms</strong>.</p>
+    <p>Beispiel: Für <span class="math">x = 10</span> hat <span class="math">2 + 5 · x</span> den Wert
+    <span class="math">2 + 5 · 10 = 52</span>.</p>
+    <p><strong>So stellst du einen Term auf:</strong></p>
+    <ol>
+      <li>Schau dir einfache Beispiele an (z.B. nach 1, 2, 3 Wochen…).</li>
+      <li>Erkenne, was sich verändert — diese Größe wird die Variable.</li>
+      <li>Schreibe den Term mit der Variablen hin.</li>
+    </ol>
+    <p><em>Achtung:</em> Setzt du eine negative Zahl ein, schreibe sie in Klammern! Z.B. für
+    <span class="math">x = −3</span> in <span class="math">6 · x − 4</span>:
+    <span class="math">6 · (−3) − 4 = −22</span>.</p>
+    <p>Das Mal-Zeichen darf weggelassen werden, wenn die Variable hinten steht:
+    <span class="math">5 · x = 5x</span>.</p>
+  `
+},
+
+{
+  id:'k2',
+  title:'Terme umformen',
+  pages:'Buch S. 129–132',
+  icon:'🔄',
+  grad:'linear-gradient(135deg,#ec4899,#f97316)',
+  description:`
+    <p>Manchmal sehen zwei Terme verschieden aus, beschreiben aber denselben Sachverhalt — sie sind
+    <em>gleichwertig</em>. Beispiel: Der Umfang eines Quadrats mit Seite <span class="math">x</span>
+    ist <span class="math">x + x + x + x</span> oder kürzer <span class="math">4 · x</span>.</p>
+    <p>Hier lernst du, Terme mit den Rechengesetzen <em>zusammenzufassen</em>: Summanden mit Variable
+    kommen zusammen, Zahlen kommen zusammen. So entstehen kürzere, übersichtlichere Terme.</p>
+  `,
+  tasks:[
+    {
+      kind:'Vereinfachen',
+      body:`Vereinfache: <span class="math">s + s + s + s</span>`,
+      answer:{term:'4*s', compact:'4·s', vars:['s'],
+        steps:[
+          `Vier gleiche Summanden: s + s + s + s.`,
+          `Das ist viermal s, also 4 · s   bzw. kurz 4s.`
+        ]
+      },
+      tips:[
+        `Zähle einfach, wie oft das s vorkommt.`,
+        `4 mal s schreibt man als 4 · s oder kürzer 4s.`
+      ],
+      solution:`<span class="math">4s</span>. Vier gleiche Summanden.`
+    },
+    {
+      kind:'Vereinfachen',
+      body:`Vereinfache: <span class="math">x + x + 2 + x + x</span>`,
+      answer:{term:'4*x+2', compact:'4·x+2', vars:['x'],
+        steps:[
+          `Sortieren: x + x + x + x + 2.`,
+          `Vier x zusammenfassen: 4·x + 2.`
+        ]
+      },
+      tips:[
+        `Sortiere zuerst: alle x zusammen, alle Zahlen zusammen.`,
+        `x + x + x + x = 4x. Die 2 bleibt allein. Ergebnis: 4x + 2.`
+      ],
+      solution:`<span class="math">4x + 2</span>. x+x+x+x = 4x, plus 2.`
+    },
+    {
+      kind:'Vereinfachen',
+      body:`Vereinfache: <span class="math">6 · x − x + 2</span>`,
+      answer:{term:'5*x+2', compact:'5·x+2', vars:['x'],
+        steps:[
+          `Beachte: ein einzelnes x ist dasselbe wie 1·x.`,
+          `Also: 6·x − 1·x + 2.`,
+          `Die x-Teile zusammenfassen: 6·x − 1·x = 5·x. Plus die 2.`
+        ]
+      },
+      tips:[
+        `Beachte: ein einzelnes x ist dasselbe wie 1·x.`,
+        `6x − x = 5x. Plus die 2.`
+      ],
+      solution:`<span class="math">5x + 2</span>. 6x − x = 5x, plus 2.`
+    },
+    {
+      kind:'Vereinfachen',
+      body:`Vereinfache: <span class="math">3 · x − 4 + 5 · x</span>`,
+      answer:{term:'8*x-4', compact:'8·x-4', vars:['x'],
+        steps:[
+          `Sortieren: 3·x + 5·x − 4.`,
+          `Die x-Teile zusammenfassen: 3·x + 5·x = 8·x.`,
+          `Ergebnis: 8·x − 4.`
+        ]
+      },
+      tips:[
+        `Trenne die x-Terme von den Zahlen. Die 3x und die 5x kannst du zusammenfassen.`,
+        `3x + 5x = 8x. Übrig bleibt nur die −4. Also: 8x − 4.`
+      ],
+      solution:`<span class="math">8x − 4</span>. 3x + 5x = 8x, minus 4.`
+    },
+    {
+      kind:'Vereinfachen',
+      body:`Vereinfache: <span class="math">2 · x − 33 − 2 · x + 3 − x</span>`,
+      answer:{term:'-x-30', compact:'−x − 30', vars:['x'],
+        steps:[
+          `x-Teile sortieren: 2·x − 2·x − x = (2−2−1)·x = −1·x = −x.`,
+          `Zahlen sortieren: −33 + 3 = −30.`,
+          `Ergebnis: −x − 30.`
+        ]
+      },
+      tips:[
+        `Sortiere wieder: alle x-Terme einsammeln, alle Zahlen einsammeln.`,
+        `x-Teile: 2x − 2x − x = −x.   Zahlen: −33 + 3 = −30. Also: −x − 30.`
+      ],
+      solution:`<span class="math">−x − 30</span>. 2x−2x−x = −x; −33+3 = −30.`
+    },
+    {
+      kind:'Vereinfachen',
+      body:`Vereinfache: <span class="math">a + a + 6 · a + 6 + a + 12</span>`,
+      answer:{term:'9*a+18', compact:'9·a+18', vars:['a'],
+        steps:[
+          `a-Teile sammeln: a + a + 6·a + a = 9·a.`,
+          `Zahlen sammeln: 6 + 12 = 18.`,
+          `Ergebnis: 9·a + 18.`
+        ]
+      },
+      tips:[
+        `Sammle die a-Teile (auch das 6·a gehört dazu!) und die Zahlen getrennt.`,
+        `a + a + 6a + a = 9a.   6 + 12 = 18.   Ergebnis: 9a + 18.`
+      ],
+      solution:`<span class="math">9a + 18</span>. a+a+6a+a = 9a; 6+12 = 18.`
+    },
+    {
+      kind:'Geometrie',
+      body:`Stelle einen vereinfachten Term für den <em>Umfang</em> des Dreiecks auf.
+      <figure>
+        <svg viewBox="0 0 260 160" width="240">
+          <polygon points="130,15 30,140 230,140" fill="rgba(236,72,153,.15)" stroke="#ec4899" stroke-width="2"/>
+          <text x="50" y="85" fill="#f4f1ff" font-family="JetBrains Mono" font-size="14">x+5</text>
+          <text x="170" y="85" fill="#f4f1ff" font-family="JetBrains Mono" font-size="14">3·x</text>
+          <text x="120" y="155" fill="#f4f1ff" font-family="JetBrains Mono" font-size="14">3·x</text>
+        </svg>
+      </figure>`,
+      answer:{term:'7*x+5', compact:'7·x+5', vars:['x'],
+        steps:[
+          `Ausführlich: alle drei Seiten addieren → (x + 5) + 3·x + 3·x.`,
+          `Klammer weglassen: x + 5 + 3·x + 3·x.`,
+          `x-Teile sammeln: x + 3·x + 3·x = 7·x.   Zahlen: nur die 5.`,
+          `Ergebnis: 7·x + 5.`
+        ]
+      },
+      tips:[
+        `Der Umfang ist die Summe aller Seiten. Schreibe sie zuerst alle hin.`,
+        `(x + 5) + 3x + 3x. Nun x-Teile zusammen: x + 3x + 3x = 7x. Plus die 5.`
+      ],
+      solution:`<span class="math">7x + 5</span>. x + 3x + 3x = 7x, plus 5.`
+    },
+    {
+      kind:'Sachaufgabe',
+      body:`Im Urlaub muss Jens für die Unterkunft <span class="math">37 €</span> pro Tag bezahlen,
+      die Bahnfahrt kostet einmalig <span class="math">45 €</span>. Für Essen rechnet er mit
+      <span class="math">26 €</span> pro Tag, für Besichtigungen <span class="math">7 €</span> pro Tag.
+      Stelle einen vereinfachten Term für die Gesamtkosten nach <span class="math">t</span> Tagen auf.`,
+      answer:{term:'70*t+45', compact:'70·t+45', vars:['t'],
+        steps:[
+          `Ausführlich: 37·t + 45 + 26·t + 7·t.`,
+          `Sortieren: 37·t + 26·t + 7·t + 45.`,
+          `t-Teile zusammenfassen: (37 + 26 + 7)·t = 70·t.`,
+          `Kompakter Term: 70·t + 45.`
+        ]
+      },
+      tips:[
+        `Was ist pro Tag (mit t multiplizieren)? Was ist einmalig (steht allein)?`,
+        `Pro Tag: 37 + 26 + 7 = 70. Einmalig: 45. Also 70 · t + 45.`
+      ],
+      solution:`<span class="math">70t + 45</span>. Pro Tag: 37+26+7 = 70.`
+    }
+  ],
+  memo:`
+    <h3>Terme umformen — Zusammenfassen</h3>
+    <p>Beim Umformen mit den Rechengesetzen entstehen <strong>gleichwertige Terme</strong>. Sie sehen
+    unterschiedlich aus, liefern aber für jede eingesetzte Zahl denselben Wert.</p>
+    <p><strong>So gehst du beim Vereinfachen vor:</strong></p>
+    <ol>
+      <li>Ordne die Summanden: erst die mit Variable, dann die ohne.</li>
+      <li>Fasse alle Summanden mit derselben Variablen zusammen.</li>
+      <li>Fasse alle Zahlen zusammen.</li>
+    </ol>
+    <p>Beispiel:</p>
+    <span class="math-block">3·x + 4 + 2·x + 1
+= 3·x + 2·x + 4 + 1
+= 5·x + 5</span>
+    <p><em>Wichtig:</em> <span class="math">a = 1·a</span>, deshalb zählt ein einzelnes
+    <span class="math">a</span> in der Summe mit. Und: <span class="math">x + x²</span> kannst du
+    <em>nicht</em> weiter zusammenfassen — nur „gleiche" Variablenteile dürfen zusammen.</p>
+  `
+},
+
+{
+  id:'k3',
+  title:'Ausmultiplizieren & Ausklammern',
+  pages:'Buch S. 133–136',
+  icon:'⚡',
+  grad:'linear-gradient(135deg,#f97316,#fbbf24)',
+  description:`
+    <p>Manchmal stehen Klammern in einem Term, z.B. <span class="math">4 · (3·x − 5)</span>. Mit dem
+    <em>Distributivgesetz</em> kannst du die Klammer auflösen: Jeder Summand in der Klammer wird mit
+    der Zahl davor multipliziert.</p>
+    <p>Andersherum geht's auch: Wenn alle Summanden einen gemeinsamen Faktor haben, kann man diesen
+    <em>ausklammern</em>. Beide Richtungen brauchst du in dieser Station — und du übst auch die
+    <em>Minusklammer-Regel</em>.</p>
+  `,
+  tasks:[
+    {
+      kind:'Ausmultiplizieren',
+      body:`Multipliziere aus: <span class="math">3 · (x + 2)</span>`,
+      answer:{term:'3*x+6', compact:'3·x+6', vars:['x'],
+        steps:[
+          `Jeden Summanden in der Klammer mit 3 multiplizieren: 3·x + 3·2.`,
+          `3·2 = 6 → Ergebnis: 3·x + 6.`
+        ]
+      },
+      tips:[
+        `Jeden Summanden in der Klammer einzeln mit 3 multiplizieren.`,
+        `3 · x = 3x   und   3 · 2 = 6. Beides addieren.`
+      ],
+      solution:`<span class="math">3x + 6</span>. 3·x + 3·2 = 3x + 6.`
+    },
+    {
+      kind:'Ausmultiplizieren',
+      body:`Multipliziere aus: <span class="math">5 · (x − 4)</span>`,
+      answer:{term:'5*x-20', compact:'5·x − 20', vars:['x'],
+        steps:[
+          `Jeder Summand mal 5: 5·x + 5·(−4).`,
+          `5·(−4) = −20 → Ergebnis: 5·x − 20.`
+        ]
+      },
+      tips:[
+        `Auch das Minus gehört dazu: 5 · x   und   5 · (−4).`,
+        `5 · x = 5x   und   5 · (−4) = −20. Ergebnis: 5x − 20.`
+      ],
+      solution:`<span class="math">5x − 20</span>. 5·x + 5·(−4) = 5x − 20.`
+    },
+    {
+      kind:'Ausmultiplizieren',
+      body:`Multipliziere aus: <span class="math">2 · (3·x + 4)</span>`,
+      answer:{term:'6*x+8', compact:'6·x+8', vars:['x'],
+        steps:[
+          `2 · 3·x + 2 · 4.`,
+          `= 6·x + 8.`
+        ]
+      },
+      tips:[
+        `2 · 3x ergibt was? Und 2 · 4?`,
+        `2 · 3x = 6x   und   2 · 4 = 8.`
+      ],
+      solution:`<span class="math">6x + 8</span>. 2·3x + 2·4 = 6x + 8.`
+    },
+    {
+      kind:'Ausmultiplizieren',
+      body:`Multipliziere aus: <span class="math">(2·x − 5) · 12</span>`,
+      answer:{term:'24*x-60', compact:'24·x − 60', vars:['x'],
+        steps:[
+          `Reihenfolge ist egal: 12 · 2·x + 12 · (−5).`,
+          `= 24·x − 60.`
+        ]
+      },
+      tips:[
+        `Es macht keinen Unterschied, ob die Zahl vor oder hinter der Klammer steht.`,
+        `12 · 2x = 24x   und   12 · (−5) = −60.`
+      ],
+      solution:`<span class="math">24x − 60</span>. 12·2x + 12·(−5) = 24x − 60.`
+    },
+    {
+      kind:'Minusklammer',
+      body:`Vereinfache mit der Minusklammer-Regel: <span class="math">7 − (3·x − 3)</span>`,
+      answer:{term:'10-3*x', compact:'10 − 3·x', vars:['x'],
+        steps:[
+          `Minus vor der Klammer dreht jedes Vorzeichen um: 7 − 3·x − (−3) = 7 − 3·x + 3.`,
+          `Sortieren und Zahlen zusammenfassen: 7 + 3 − 3·x = 10 − 3·x.`
+        ]
+      },
+      tips:[
+        `Minus vor der Klammer kehrt jedes Vorzeichen in der Klammer um.`,
+        `7 − 3x − (−3) = 7 − 3x + 3 = 10 − 3x.`
+      ],
+      solution:`<span class="math">10 − 3x</span>. 7 − 3x + 3 = 10 − 3x.`
+    },
+    {
+      kind:'Ausklammern',
+      body:`Klammere die Zahl 2 aus: <span class="math">8 · x + 16</span>`,
+      answer:['2(4x+8)','2·(4x+8)','2(4·x+8)','2·(4·x+8)','2*(4*x+8)','2·(8+4·x)','2·(8+4x)','2(8+4x)','2(8+4·x)'],
+      tips:[
+        `Welche Zahl steckt in beiden Summanden? Die 2 ist in 8 und in 16 enthalten.`,
+        `8x = 2 · 4x   und   16 = 2 · 8. Also: 2 · (4x + 8).`
+      ],
+      solution:`<span class="math">2 · (4x + 8)</span>. 8=2·4 und 16=2·8.`
+    },
+    {
+      kind:'Ausklammern',
+      body:`Klammere die Zahl 3 aus: <span class="math">9 · x − 15</span>`,
+      answer:['3(3x-5)','3·(3x-5)','3(3·x-5)','3·(3·x-5)','3*(3*x-5)'],
+      tips:[
+        `9 ist 3 · 3, und 15 ist 3 · 5.`,
+        `Also: 3 · (3x − 5).`
+      ],
+      solution:`<span class="math">3 · (3x − 5)</span>. 9=3·3 und 15=3·5.`
+    },
+    {
+      kind:'Vermischt',
+      body:`Vereinfache so weit wie möglich: <span class="math">3 · (x + 2) − 4 · x</span>`,
+      answer:{term:'-x+6', compact:'−x + 6', vars:['x'],
+        steps:[
+          `Erst die Klammer auflösen: 3·x + 6 − 4·x.`,
+          `Sortieren: 3·x − 4·x + 6.`,
+          `x-Teile zusammenfassen: 3·x − 4·x = −x.`,
+          `Ergebnis: −x + 6   (auch 6 − x).`
+        ]
+      },
+      tips:[
+        `Erst die Klammer auflösen, dann zusammenfassen.`,
+        `3 · (x + 2) = 3x + 6. Jetzt: 3x + 6 − 4x. Sortiere die x: 3x − 4x = −x.`
+      ],
+      solution:`<span class="math">−x + 6</span>. 3x+6−4x = −x+6.`
+    },
+    {
+      kind:'Beweis',
+      body:`Auf jeder Seite eines quadratischen Grundstücks stehen <span class="math">p</span> Pfähle —
+      die Eckpfähle gehören jeweils zu zwei Seiten. Tim hat einen Term für die Anzahl der Pfähle
+      aufgestellt: <span class="math">4 · (p − 1)</span>. Erstelle einen weiteren Term, der ebenfalls
+      die Pfähle-Anzahl beschreibt, aber <em>nicht</em> so aussieht wie der von Tim.
+      <span class="hint-line">Tipp: Multipliziere Tims Term aus.</span>`,
+      answer:{term:'4*p-4', compact:'4·p − 4', vars:['p'],
+        steps:[
+          `Multipliziere Tims Term aus: 4 · (p − 1) = 4·p − 4·1 = 4·p − 4.`,
+          `Beide Terme beschreiben dieselbe Anzahl, sehen aber verschieden aus — sie sind gleichwertig.`
+        ]
+      },
+      tips:[
+        `Du kannst Tims Term mit dem Distributivgesetz umformen — dann sieht er anders aus, beschreibt aber dasselbe.`,
+        `4 · (p − 1) — multipliziere die Klammer aus: 4·p und 4·(−1).`
+      ],
+      solution:`<span class="math">4p − 4</span>. 4·(p−1) = 4p−4.`
+    }
+  ],
+  memo:`
+    <h3>Distributivgesetz: Ausmultiplizieren &amp; Ausklammern</h3>
+    <p><strong>Ausmultiplizieren</strong> (Klammer auflösen): Jeder Summand in der Klammer wird mit
+    dem Faktor multipliziert.</p>
+    <span class="math-block">a · (b + c) = a·b + a·c
+4 · (3·x − 5) = 4·3·x − 4·5 = 12·x − 20</span>
+    <p><strong>Ausklammern</strong> (umgekehrte Richtung): Den gemeinsamen Faktor aus jedem Summanden
+    herausziehen.</p>
+    <span class="math-block">12·x − 24 = 12·(x − 2)
+6·x + 9 = 3·(2·x + 3)</span>
+    <p><strong>Minusklammer-Regel:</strong> Ein Minus vor der Klammer dreht <em>jedes</em> Vorzeichen
+    in der Klammer um.</p>
+    <span class="math-block">−(4·x + 5) = −4·x − 5
+7 − (3·x − 3) = 7 − 3·x + 3 = 10 − 3·x</span>
+    <p><strong>Vorgehen beim Vereinfachen mit Klammern:</strong></p>
+    <ol>
+      <li>Klammern auflösen (ausmultiplizieren).</li>
+      <li>Summanden mit und ohne Variable ordnen.</li>
+      <li>Zusammenfassen.</li>
+    </ol>
+  `
+},
+
+{
+  id:'k4',
+  title:'Gleichungen aufstellen & lösen',
+  pages:'Buch S. 137–139',
+  icon:'🎯',
+  grad:'linear-gradient(135deg,#22d3ee,#3b82f6)',
+  description:`
+    <p>Eine <em>Gleichung</em> ist ein Term auf der einen und ein anderer Term auf der anderen Seite
+    eines Gleichheitszeichens, z.B. <span class="math">103 + w · 2,50 = 163</span>. Eine Zahl heißt
+    <em>Lösung</em>, wenn beim Einsetzen für die Variable beide Seiten denselben Wert ergeben.</p>
+    <p>Hier lernst du zwei Wege, die Lösung zu finden: <em>systematisches Probieren</em> (Werte
+    einsetzen, bis es passt) und <em>Rückwärtsrechnen</em> (alle Rechenschritte rückwärts gehen).
+    Anschließend machst du immer eine <em>Probe</em>.</p>
+  `,
+  tasks:[
+    {
+      kind:'Probe',
+      body:`Ist die Zahl <span class="math">5</span> eine Lösung von <span class="math">2 · x = 10</span>?
+      Antworte mit „ja" oder „nein".`,
+      answer:['ja','yes','stimmt','ja.'],
+      tips:[
+        `Setze 5 für x ein und rechne die linke Seite aus.`,
+        `2 · 5 = 10. Stimmt das mit der rechten Seite überein?`
+      ],
+      solution:`<span class="math">ja</span>. 2·5 = 10 ✓`
+    },
+    {
+      kind:'Lösen',
+      body:`Löse die Gleichung: <span class="math">7 · x = 49</span>`,
+      answer:{num:7},
+      tips:[
+        `Welche Zahl mal 7 ergibt 49?`,
+        `Du kannst beide Seiten durch 7 teilen: x = 49 : 7.`
+      ],
+      solution:`<span class="math">x = 7</span>. 49 : 7 = 7.`
+    },
+    {
+      kind:'Lösen',
+      body:`Löse die Gleichung: <span class="math">4 · x + 24 = 184</span>`,
+      answer:{num:40},
+      tips:[
+        `Mache die Rechenschritte rückwärts. Was wurde zuletzt mit x gemacht?`,
+        `Erst die +24 rückgängig: 184 − 24 = 160. Dann durch 4: 160 : 4 = 40.`
+      ],
+      solution:`<span class="math">x = 40</span>. 184−24 = 160; 160:4 = 40.`
+    },
+    {
+      kind:'Lösen',
+      body:`Löse die Gleichung: <span class="math">2 · x + 6 = 0</span>`,
+      answer:{num:-3},
+      tips:[
+        `Mache zuerst das +6 rückgängig.`,
+        `0 − 6 = −6. Dann −6 : 2 = −3.`
+      ],
+      solution:`<span class="math">x = −3</span>. 0−6 = −6; −6:2 = −3.`
+    },
+    {
+      kind:'Lösen',
+      body:`Löse die Gleichung: <span class="math">5 · x − 11 = 1</span>`,
+      answer:{num:2.4},
+      tips:[
+        `Erst +11 auf beiden Seiten: 5 · x = 12.`,
+        `Jetzt durch 5: x = 12 : 5 = 2,4 (oder 12/5).`
+      ],
+      solution:`<span class="math">x = 2,4</span>. 12 : 5 = 2,4.`
+    },
+    {
+      kind:'Sachaufgabe',
+      body:`Tim hat <span class="math">103 €</span> in der Spardose und spart <span class="math">2,50 €</span>
+      pro Woche dazu. Wie viele Wochen muss er sparen, um <span class="math">163 €</span> zu haben?`,
+      equation:{
+        prompt:`Stelle zuerst die Gleichung auf:`,
+        answer:{term:'103+2.5*w-163', vars:['w']}
+      },
+      answer:{num:24},
+      tips:[
+        `Was ist gleich viel? Tims Erspartes nach w Wochen muss 163 € sein.`,
+        `Stelle die Gleichung auf und mache die Rechenschritte rückwärts. Was wurde mit w gemacht?`,
+        `Erst 103 von 163 abziehen: 60. Dann 60 : 2,50 = 24.`
+      ],
+      solution:`<span class="math">w = 24</span>. Gleichung: 103 + 2,5 · w = 163. Rechenweg: 163 − 103 = 60, dann 60 : 2,5 = 24.`
+    },
+    {
+      kind:'Sachaufgabe',
+      body:`Das Elefantenbaby Chandra wiegt bei der Geburt <span class="math">116 kg</span> und nimmt
+      pro Woche <span class="math">7 kg</span> zu. Nach wie vielen Wochen wiegt es
+      <span class="math">200 kg</span>?`,
+      equation:{
+        prompt:`Stelle zuerst die Gleichung auf:`,
+        answer:{term:'116+7*w-200', vars:['w']}
+      },
+      answer:{num:12},
+      tips:[
+        `Welche Größe bleibt gleich, welche verändert sich? Suche eine Variable für die unbekannte Anzahl.`,
+        `Schreibe einen Term für das Gewicht nach w Wochen — und setze ihn gleich 200.`,
+        `200 − 116 = 84. Dann 84 : 7 = 12.`
+      ],
+      solution:`<span class="math">w = 12</span>. Gleichung: 116 + 7 · w = 200. Rechenweg: 200 − 116 = 84, dann 84 : 7 = 12.`
+    },
+    {
+      kind:'Streichholz-Aufgabe',
+      body:`Mit drei Streichhölzern baust du ein neues Quadrat in einer Reihe (das erste Quadrat
+      braucht 4, jedes weitere 3 Hölzer). Der Term für <span class="math">x</span> Quadrate lautet
+      <span class="math">1 + 3·x</span>. Wie viele Quadrate kannst du höchstens mit
+      <span class="math">70</span> Hölzern bauen?`,
+      equation:{
+        prompt:`Stelle zuerst die Gleichung auf:`,
+        answer:{term:'1+3*x-70', vars:['x']}
+      },
+      answer:{num:23},
+      tips:[
+        `Setze den Term für die Hölzer gleich 70 — das ergibt deine Gleichung.`,
+        `Mache die Rechenschritte rückwärts. Was zuletzt? Die +1.`,
+        `70 − 1 = 69. Dann 69 : 3 = 23. (Probe: 1 + 3·23 = 70 ✓)`
+      ],
+      solution:`<span class="math">x = 23</span>. Gleichung: 1 + 3 · x = 70. Rechenweg: 70 − 1 = 69, dann 69 : 3 = 23.`
+    }
+  ],
+  memo:`
+    <h3>Gleichungen lösen — Probieren &amp; Rückwärtsrechnen</h3>
+    <p>Eine Zahl heißt <strong>Lösung</strong> einer Gleichung, wenn linke und rechte Seite beim
+    Einsetzen denselben Wert ergeben.</p>
+    <p><strong>Methode 1 — Systematisches Probieren:</strong> Setze verschiedene Zahlen ein und nähere
+    dich der Lösung. Gut bei einfachen Zahlen oder mit einer Tabelle.</p>
+    <p><strong>Methode 2 — Rückwärtsrechnen:</strong> Mache die Rechenschritte des Terms in
+    <em>umgekehrter Reihenfolge</em> rückgängig.</p>
+    <span class="math-block">Vorwärts (Term aufgebaut):
+   x  →  ·2,5  →  +103  →  Ergebnis
+
+Rückwärts (zur Lösung):
+   Ergebnis  →  −103  →  :2,5  →  x</span>
+    <p>Beispiel: <span class="math">103 + w · 2,5 = 163</span></p>
+    <p>163 − 103 = 60, dann 60 : 2,5 = <strong>24</strong>. Also <span class="math">w = 24</span>.</p>
+    <p><em>Probe nicht vergessen!</em> Setze die Lösung in die ursprüngliche Gleichung ein und prüfe,
+    ob beide Seiten denselben Wert haben.</p>
+  `
+},
+
+{
+  id:'k5',
+  title:'Äquivalenzumformungen',
+  pages:'Buch S. 140–143',
+  icon:'⚖️',
+  grad:'linear-gradient(135deg,#3b82f6,#8b5cf6)',
+  description:`
+    <p>Wenn die Variable <em>auf beiden Seiten</em> der Gleichung vorkommt — z.B.
+    <span class="math">5·z + 2 = 2·z + 8</span> — reicht Rückwärtsrechnen nicht mehr. Du brauchst
+    <em>Äquivalenzumformungen</em>: auf <em>beiden</em> Seiten dieselbe Rechnung durchführen.</p>
+    <p>Stell dir eine Waage vor: Wenn du auf beiden Seiten gleich viel weglegst oder dazulegst, bleibt
+    sie im Gleichgewicht. Genauso bleiben die Lösungen einer Gleichung unverändert.</p>
+  `,
+  tasks:[
+    {
+      kind:'Lösen',
+      body:`Löse: <span class="math">5 · x + 4 = 2 · x + 10</span>`,
+      answer:{num:2},
+      tips:[
+        `Bringe alle x auf eine Seite und alle Zahlen auf die andere.`,
+        `−2x auf beiden Seiten → 3x + 4 = 10. Dann −4 → 3x = 6. Schließlich :3 → x = 2.`
+      ],
+      solution:`<span class="math">x = 2</span>. 3x+4=10 → 3x=6 → x=2.`
+    },
+    {
+      kind:'Lösen',
+      body:`Löse: <span class="math">9 · x + 3 = 7 · x − 2</span>`,
+      answer:{num:-2.5},
+      tips:[
+        `Erst die x sortieren: −7x auf beiden Seiten.`,
+        `→ 2x + 3 = −2.   −3 → 2x = −5.   :2 → x = −5/2 = −2,5.`
+      ],
+      solution:`<span class="math">x = −2,5</span>. 2x=−5 → x=−2,5.`
+    },
+    {
+      kind:'Lösen',
+      body:`Löse: <span class="math">10 · x − 35 = 4 · x − 17</span>`,
+      answer:{num:3},
+      tips:[
+        `Bringe die x-Teile zusammen (−4x auf beiden Seiten).`,
+        `→ 6x − 35 = −17. Dann +35 → 6x = 18. Dann :6 → x = 3.`
+      ],
+      solution:`<span class="math">x = 3</span>. 6x=18 → x=3.`
+    },
+    {
+      kind:'Lösen',
+      body:`Löse: <span class="math">3 · x + 15 = 15 · x + 27</span>`,
+      answer:{num:-1},
+      tips:[
+        `Variablen besser auf die Seite, wo der Vorfaktor größer ist (also nach rechts).`,
+        `−3x → 15 = 12x + 27. Dann −27 → −12 = 12x. :12 → x = −1.`
+      ],
+      solution:`<span class="math">x = −1</span>. −12=12x → x=−1.`
+    },
+    {
+      kind:'Mit Klammern',
+      body:`Löse: <span class="math">2 · (x + 2) − 5 = 9</span>`,
+      answer:{num:5},
+      tips:[
+        `Erst die Klammer ausmultiplizieren oder die Gleichung vereinfachen.`,
+        `2x + 4 − 5 = 9 → 2x − 1 = 9 → 2x = 10 → x = 5.`
+      ],
+      solution:`<span class="math">x = 5</span>. 2x=10 → x=5.`
+    },
+    {
+      kind:'Mit Klammern',
+      body:`Löse: <span class="math">5 · (x + 1) = 10 − 3 · x</span>`,
+      answer:{num:0.625},
+      tips:[
+        `Erst die Klammer auflösen: 5x + 5 = 10 − 3x.`,
+        `+3x → 8x + 5 = 10. −5 → 8x = 5. :8 → x = 5/8 = 0,625.`
+      ],
+      solution:`<span class="math">x = 5/8 = 0,625</span>. 8x=5 → x=5/8.`
+    },
+    {
+      kind:'Sachaufgabe',
+      body:`Guido denkt sich eine Zahl, vervierfacht sie und addiert dann 26. Das Ergebnis ist genauso
+      viel wie das <em>Sechsfache</em> seiner Zahl. Stelle die Gleichung auf und finde die Zahl.`,
+      answer:{num:13},
+      tips:[
+        `Nenne die Zahl z. Dann ist die Gleichung: 4·z + 26 = 6·z.`,
+        `−4z → 26 = 2z → z = 13.`
+      ],
+      solution:`<span class="math">z = 13</span>. 26=2z → z=13.`
+    },
+    {
+      kind:'Geometrie',
+      body:`Ein Rechteck ist <span class="math">7 cm</span> lang. Verkürzt man diese Seite um
+      <span class="math">4 cm</span> und verlängert die andere unbekannte Seite <span class="math">a</span>
+      um <span class="math">6 cm</span>, so ändert sich der Flächeninhalt nicht. Bestimme
+      <span class="math">a</span>.
+      <span class="hint-line">Hinweis: Stelle die Gleichung 7·a = 3·(a + 6) auf und löse sie.</span>`,
+      answer:{num:4.5},
+      tips:[
+        `Alte Fläche = neue Fläche. Alt: 7 · a. Neu: 3 · (a + 6).`,
+        `7a = 3a + 18 → 4a = 18 → a = 18/4 = 4,5.`
+      ],
+      solution:`<span class="math">a = 4,5</span>. 4a=18 → a=4,5.`
+    }
+  ],
+  memo:`
+    <h3>Äquivalenzumformungen</h3>
+    <p>Die Lösung einer Gleichung ändert sich nicht, wenn du auf <strong>beiden Seiten</strong>:</p>
+    <ul>
+      <li>dieselbe Zahl (oder denselben Term) <strong>addierst</strong> oder <strong>subtrahierst</strong>,</li>
+      <li>mit derselben Zahl (≠ 0) <strong>multiplizierst</strong> oder durch sie <strong>dividierst</strong>.</li>
+    </ul>
+    <p><strong>Vorgehen beim Lösen einer Gleichung:</strong></p>
+    <ol>
+      <li>Beide Seiten <strong>vereinfachen</strong> (Klammern auflösen, zusammenfassen).</li>
+      <li>Alle Terme mit Variable auf <strong>eine</strong> Seite, alle Zahlen auf die andere.</li>
+      <li>Durch den Vorfaktor der Variablen <strong>dividieren</strong> — am Ende soll x allein stehen.</li>
+      <li><strong>Probe</strong> machen: Lösung in die Ausgangsgleichung einsetzen.</li>
+    </ol>
+    <p>Schreibweise mit Strich daneben:</p>
+    <span class="math-block">5·x + 4 = 2·x + 10  | −2·x
+3·x + 4 = 10        | −4
+3·x     = 6         | :3
+   x    = 2</span>
+    <p><em>Probe:</em> 5·2 + 4 = 14   und   2·2 + 10 = 14. ✓</p>
+  `
+},
+
+{
+  id:'k6',
+  title:'Äquivalenzumformungen intensiv',
+  pages:'Übungsstation',
+  icon:'⚖️',
+  grad:'linear-gradient(135deg,#f97316,#ef4444)',
+  isNew:true,
+  description:`
+    <p>Diese Station ist ein <em>Intensiv-Training</em> für Äquivalenzumformungen. Du löst hier 20 Gleichungen — von einfachen mit ganzen Zahlen bis hin zu Gleichungen mit Klammern und Dezimalzahlen.</p>
+    <p>Denke immer daran: <em>Was du auf einer Seite machst, musst du auch auf der anderen Seite machen.</em> Am Ende steht die Variable allein.</p>
+  `,
+  tasks:[
+    {kind:'Einfach', body:`Löse: <span class="math">x + 5 = 12</span>`, answer:{num:7}, tips:[`Was stört auf der Seite von x? Die +5.`,`Ziehe auf beiden Seiten die gleiche Zahl ab, um x allein zu haben.`], solution:`<span class="math">x = 7</span>. 12 − 5 = 7.`},
+    {kind:'Einfach', body:`Löse: <span class="math">x − 3 = 10</span>`, answer:{num:13}, tips:[`Was stört? Die −3. Wie machst du ein Minus rückgängig?`,`Addiere auf beiden Seiten die gleiche Zahl.`], solution:`<span class="math">x = 13</span>.`},
+    {kind:'Einfach', body:`Löse: <span class="math">4 · x = 28</span>`, answer:{num:7}, tips:[`x wird mit 4 multipliziert. Was ist die Umkehrung davon?`,`Teile beide Seiten durch den Vorfaktor von x.`], solution:`<span class="math">x = 7</span>.`},
+    {kind:'Einfach', body:`Löse: <span class="math">3 · x + 7 = 22</span>`, answer:{num:5}, tips:[`Zwei Schritte nötig. Welche Zahl entfernst du zuerst — die +7 oder die ·3?`,`Erst die +7 loswerden (auf beiden Seiten abziehen), dann durch den Vorfaktor teilen.`], solution:`<span class="math">x = 5</span>. 22−7=15, 15:3=5.`},
+    {kind:'Mittel', body:`Löse: <span class="math">5 · x − 8 = 2 · x + 7</span>`, answer:{num:5}, tips:[`x kommt auf beiden Seiten vor. Bringe zuerst alle x auf eine Seite.`,`Ziehe auf beiden Seiten den kleineren x-Term ab.`,`Jetzt hast du nur noch auf einer Seite x. Bringe die Zahl auf die andere Seite.`], solution:`<span class="math">x = 5</span>. 3x = 15.`},
+    {kind:'Mittel', body:`Löse: <span class="math">7 · x + 3 = 3 · x + 19</span>`, answer:{num:4}, tips:[`Welcher x-Term ist kleiner? Den ziehst du auf beiden Seiten ab.`,`Jetzt steht x nur noch auf einer Seite. Bringe die Zahl auf die andere.`,`Teile durch den Vorfaktor von x.`], solution:`<span class="math">x = 4</span>.`},
+    {kind:'Mittel', body:`Löse: <span class="math">6 · x − 10 = 4 · x + 2</span>`, answer:{num:6}, tips:[`Bringe die x-Terme auf eine Seite. Welchen x-Term ziehst du ab?`,`Jetzt die Zahlen auf die andere Seite bringen.`,`Teile durch den Vorfaktor.`], solution:`<span class="math">x = 6</span>.`},
+    {kind:'Mittel', body:`Löse: <span class="math">2 · x + 1 = 9 · x − 20</span>`, answer:{num:3}, tips:[`x kommt auf beiden Seiten vor. Bringe x auf die Seite, wo der Vorfaktor größer ist.`,`Jetzt die Zahlen auf die andere Seite.`,`Teile durch den Vorfaktor.`], solution:`<span class="math">x = 3</span>.`},
+    {kind:'Mittel', body:`Löse: <span class="math">8 · x − 5 = 3 · x + 15</span>`, answer:{num:4}, tips:[`Ziehe den kleineren x-Term auf beiden Seiten ab.`,`Bringe die Zahl auf die andere Seite.`,`Teile durch den Vorfaktor.`], solution:`<span class="math">x = 4</span>.`},
+    {kind:'Mittel', body:`Löse: <span class="math">12 − 4 · x = 2 · x</span>`, answer:{num:2}, tips:[`Hier stehen die x rechts und die Zahl links. Bringe alle x auf eine Seite.`,`Addiere den x-Term von links auf beiden Seiten.`,`Teile durch den neuen Vorfaktor.`], solution:`<span class="math">x = 2</span>.`},
+    {kind:'Mit Klammern', body:`Löse: <span class="math">3 · (x + 4) = 21</span>`, answer:{num:3}, tips:[`Löse zuerst die Klammer auf (ausmultiplizieren).`,`Jetzt hast du eine einfache Gleichung. Welche Zahl muss weg?`,`Teile durch den Vorfaktor von x.`], solution:`<span class="math">x = 3</span>.`},
+    {kind:'Mit Klammern', body:`Löse: <span class="math">2 · (x − 5) = x + 3</span>`, answer:{num:13}, tips:[`Multipliziere die Klammer aus.`,`Bringe alle x auf eine Seite und alle Zahlen auf die andere.`,`Wie viel ist x?`], solution:`<span class="math">x = 13</span>.`},
+    {kind:'Mit Klammern', body:`Löse: <span class="math">4 · (2 · x + 1) = 3 · (x − 2) + 29</span>`, answer:{num:3.8}, tips:[`Beide Klammern ausmultiplizieren — links und rechts.`,`Rechte Seite: die Zahlen zusammenfassen.`,`Jetzt x auf eine Seite, Zahlen auf die andere.`,`Teile durch den Vorfaktor.`], solution:`<span class="math">x = 3,8 (= 19/5)</span>. 8x+4 = 3x+23 → 5x = 19 → x = 3,8.`},
+    {kind:'Mit Klammern', body:`Löse: <span class="math">5 · (x + 2) − 3 · (x − 1) = 17</span>`, answer:{num:2}, tips:[`Beide Klammern einzeln ausmultiplizieren. Achte beim Minus vor der zweiten Klammer auf die Vorzeichen!`,`Fasse auf der linken Seite die x-Teile und die Zahlen zusammen.`,`Bringe die Zahl auf die andere Seite und teile durch den Vorfaktor.`], solution:`<span class="math">x = 2</span>.`},
+    {kind:'Dezimalzahlen', body:`Löse: <span class="math">2,5 · x + 1,5 = 1,5 · x + 7</span>`, answer:{num:5.5}, tips:[`Dezimalzahlen funktionieren genauso. Ziehe den kleineren x-Term auf beiden Seiten ab.`,`Jetzt die Zahl auf die andere Seite bringen.`], solution:`<span class="math">x = 5,5</span>.`},
+    {kind:'Dezimalzahlen', body:`Löse: <span class="math">0,5 · x − 4 = 1,5 · x − 10</span>`, answer:{num:6}, tips:[`Ziehe den kleineren x-Term ab. Welcher ist kleiner — 0,5x oder 1,5x?`,`Jetzt die Zahlen sortieren. Bringe die Zahl auf die andere Seite.`], solution:`<span class="math">x = 6</span>.`},
+    {kind:'Dezimalzahlen', body:`Löse: <span class="math">3,2 · x + 5 = 1,2 · x + 15</span>`, answer:{num:5}, tips:[`Ziehe 1,2x auf beiden Seiten ab.`,`Bringe die Zahl auf die andere Seite.`,`Teile durch den Vorfaktor.`], solution:`<span class="math">x = 5</span>.`},
+    {kind:'Sachaufgabe', body:`Ein Kino-Ticket kostet <span class="math">9,50 €</span>. Marie hat <span class="math">35 €</span> und möchte noch Popcorn für <span class="math">4,50 €</span> kaufen. Für wie viele Tickets reicht ihr Geld?`, answer:{num:3}, tips:[`Überlege zuerst: Wie viel Geld hat Marie noch übrig, nachdem sie Popcorn gekauft hat?`,`Teile das übrige Geld durch den Ticketpreis. Runde ab — halbe Tickets gibt es nicht!`], solution:`<span class="math">3 Tickets</span>. 35 − 4,50 = 30,50; 30,50 : 9,50 ≈ 3,2 → 3.`},
+    {kind:'Sachaufgabe', body:`Jonas und seine Schwester teilen sich die Kosten für ein Geschenk. Jonas zahlt <span class="math">5 €</span> mehr als seine Schwester. Zusammen zahlen sie <span class="math">47 €</span>. Wie viel zahlt Jonas?`, answer:{num:26}, tips:[`Nenne den Betrag der Schwester x. Wie viel zahlt dann Jonas?`,`Stelle eine Gleichung auf: Beide Beträge zusammen = Gesamtpreis.`,`Löse die Gleichung. Vergiss nicht: Gefragt ist, was Jonas zahlt, nicht x!`], solution:`<span class="math">Jonas zahlt 26 €</span>. Schwester: 21 €, Jonas: 21 + 5 = 26 €.`},
+    {kind:'Sachaufgabe', body:`Ein Schwimmbad-Abo kostet <span class="math">12 €</span> pro Monat. Ohne Abo kostet ein Besuch <span class="math">3,50 €</span>. Ab wie vielen Besuchen im Monat lohnt sich das Abo?`, answer:{num:4}, tips:[`Überlege: Ab wann ist der Einzeleintritt teurer als das Abo?`,`Teile den Abo-Preis durch den Einzelpreis. Was bedeutet das Ergebnis?`,`Da es nur ganze Besuche gibt: aufrunden!`], solution:`Ab <span class="math">4 Besuchen</span>. 3,50 · 4 = 14 > 12.`}
+  ],
+  memo:`
+    <h3>Äquivalenzumformungen — Zusammenfassung</h3>
+    <p><strong>Ziel:</strong> Die Variable soll allein auf einer Seite stehen.</p>
+    <p><strong>Erlaubt ist:</strong> Auf beiden Seiten dieselbe Zahl addieren, subtrahieren, multiplizieren oder dividieren (nicht durch 0!).</p>
+    <p><strong>Schritt für Schritt:</strong></p>
+    <ol>
+      <li>Klammern auflösen.</li>
+      <li>Auf jeder Seite vereinfachen.</li>
+      <li>Variable auf eine Seite bringen, Zahlen auf die andere.</li>
+      <li>Durch den Vorfaktor teilen.</li>
+      <li>Probe machen.</li>
+    </ol>
+    <span class="math-block">Beispiel: 5·x + 4 = 2·x + 10  | −2x
+           3·x + 4 = 10        | −4
+           3·x     = 6         | :3
+              x    = 2</span>
+  `
+},
+
+{
+  id:'k7b',
+  title:'Bruchgleichungen',
+  pages:'Neu · Bruchterme & Bruchgleichungen',
+  icon:'🧩',
+  grad:'linear-gradient(135deg,#ef4444,#f97316)',
+  isNew:true,
+  description:`
+    <p>Wenn die Variable <em>im Nenner</em> eines Bruchs steht, hast du eine <em>Bruchgleichung</em>. Zum Lösen multiplizierst du beide Seiten so, dass der Nenner verschwindet — und löst dann ganz normal weiter.</p>
+    <p><em>Wichtig:</em> Der Nenner darf nie 0 werden! Prüfe am Ende, ob deine Lösung erlaubt ist.</p>
+  `,
+  tasks:[
+    {kind:'Einstieg', body:`Löse im Kopf: <span class="math"><span class="frac"><span class="num">12</span><span class="den">x</span></span> = 4</span>`, answer:{num:3}, tips:[`Überlege: Welche Zahl muss unten im Bruch stehen, damit oben 12 geteilt durch sie 4 ergibt?`,`Drehe die Aufgabe um: Statt 12 geteilt durch ? = 4, denke: 4 mal ? = 12.`], solution:`<span class="math">x = 3</span>. 12 : 4 = 3.`},
+    {kind:'Einstieg', body:`Löse im Kopf: <span class="math"><span class="frac"><span class="num">20</span><span class="den">x</span></span> = 5</span>`, answer:{num:4}, tips:[`Gleiche Idee wie eben: Was mal 5 ergibt 20?`], solution:`<span class="math">x = 4</span>.`},
+    {kind:'Einstieg', body:`Löse: <span class="math"><span class="frac"><span class="num">42</span><span class="den">x</span></span> = 6</span>`, answer:{num:7}, tips:[`Multipliziere beide Seiten mit x, damit x aus dem Nenner verschwindet.`,`Jetzt steht x nur noch mit einem Vorfaktor da. Teile durch diesen.`], solution:`<span class="math">x = 7</span>.`},
+    {kind:'Mit Klammer im Nenner', body:`Löse: <span class="math"><span class="frac"><span class="num">10</span><span class="den">x + 1</span></span> = 2</span>`, answer:{num:4}, tips:[`Multipliziere beide Seiten mit dem gesamten Nenner (x+1).`,`Jetzt ausmultiplizieren und nach x auflösen.`,`Bringe die Zahl auf die andere Seite und teile durch den Vorfaktor.`], solution:`<span class="math">x = 4</span>. 10 = 2x+2 → x = 4.`},
+    {kind:'Mit Klammer im Nenner', body:`Löse: <span class="math"><span class="frac"><span class="num">15</span><span class="den">x − 2</span></span> = 3</span>`, answer:{num:7}, tips:[`Multipliziere beide Seiten mit (x−2).`,`Multipliziere die Klammer auf der rechten Seite aus.`,`Bringe die Zahlen auf eine Seite und teile durch den Vorfaktor.`], solution:`<span class="math">x = 7</span>.`},
+    {kind:'Mit Klammer im Nenner', body:`Löse: <span class="math"><span class="frac"><span class="num">8</span><span class="den">2·x + 4</span></span> = 1</span>`, answer:{num:2}, tips:[`Multipliziere beide Seiten mit dem Nenner (2x+4).`,`Jetzt hast du eine einfache Gleichung. Bringe die Zahl auf die andere Seite.`,`Teile durch den Vorfaktor von x.`], solution:`<span class="math">x = 2</span>.`},
+    {kind:'Bruch auf beiden Seiten', body:`Löse: <span class="math"><span class="frac"><span class="num">6</span><span class="den">x</span></span> = <span class="frac"><span class="num">18</span><span class="den">x + 4</span></span></span>
+    <span class="hint-line">Tipp: Multipliziere beide Seiten mit x · (x + 4).</span>`, answer:{num:2}, tips:[`Bei Brüchen auf beiden Seiten hilft „kreuzweise multiplizieren": Zähler links mal Nenner rechts = Zähler rechts mal Nenner links.`,`Multipliziere die Klammer aus.`,`Bringe alle x auf eine Seite und die Zahlen auf die andere.`,`Teile durch den Vorfaktor.`], solution:`<span class="math">x = 2</span>. 6·(x+4)=18·x → 24=12x → x=2.`},
+    {kind:'Bruch auf beiden Seiten', body:`Löse: <span class="math"><span class="frac"><span class="num">4</span><span class="den">x</span></span> = <span class="frac"><span class="num">12</span><span class="den">x + 6</span></span></span>`, answer:{num:3}, tips:[`Kreuzweise multiplizieren: Zähler links · Nenner rechts = Zähler rechts · Nenner links.`,`Ausmultiplizieren und x auf eine Seite bringen.`,`Teile durch den Vorfaktor.`], solution:`<span class="math">x = 3</span>.`},
+    {kind:'Schwieriger', body:`Löse: <span class="math"><span class="frac"><span class="num">2</span><span class="den">x − 1</span></span> + 3 = 5</span>`, answer:{num:2}, tips:[`Isoliere zuerst den Bruch — bringe die 3 auf die andere Seite.`,`Jetzt steht der Bruch allein. Was muss im Nenner stehen, damit der Bruch diesen Wert ergibt?`,`Löse den Nenner-Term nach x auf.`], solution:`<span class="math">x = 2</span>. Bruch = 2 → x−1 = 1 → x = 2.`},
+    {kind:'Schwieriger', body:`Löse: <span class="math"><span class="frac"><span class="num">24</span><span class="den">x + 2</span></span> = 3</span>`, answer:{num:6}, tips:[`Multipliziere beide Seiten mit (x+2).`,`Multipliziere die Klammer aus und bringe die Zahlen auf eine Seite.`,`Teile durch den Vorfaktor.`], solution:`<span class="math">x = 6</span>.`},
+    {kind:'Sachaufgabe', body:`Die Geschwindigkeit berechnet man mit <span class="math">v = <span class="frac"><span class="num">s</span><span class="den">t</span></span></span> (Strecke geteilt durch Zeit). Ein Fahrrad fährt mit <span class="math">15 km/h</span>. Wie lange braucht es für <span class="math">22,5 km</span>? Gib die Stunden ein.`, answer:{num:1.5}, tips:[`Die Formel v = s/t nach t umstellen: Wie bekommst du t allein?`,`Multipliziere beide Seiten mit t, dann teile beide Seiten durch v.`,`Setze die Zahlen ein und rechne aus.`], solution:`<span class="math">t = 1,5 Stunden</span>. 22,5 : 15 = 1,5.`}
+  ],
+  memo:`
+    <h3>Bruchgleichungen lösen</h3>
+    <p><strong>Schritt 1:</strong> Nenne die Werte, für die der Nenner 0 wird (= verboten!).</p>
+    <p><strong>Schritt 2:</strong> Multipliziere beide Seiten mit dem Nenner, damit die Variable nicht mehr im Nenner steht.</p>
+    <p><strong>Schritt 3:</strong> Löse die entstandene Gleichung wie gewohnt.</p>
+    <p><strong>Schritt 4:</strong> Probe — und prüfe, ob die Lösung erlaubt ist.</p>
+    <span class="math-block">Beispiel: <span class="frac"><span class="num">10</span><span class="den">x + 1</span></span> = 2
+
+Beide Seiten · (x + 1):
+10 = 2 · (x + 1) = 2x + 2
+8 = 2x → x = 4
+
+Probe: <span class="frac"><span class="num">10</span><span class="den">4 + 1</span></span> = <span class="frac"><span class="num">10</span><span class="den">5</span></span> = 2 ✓</span>
+  `
+},
+
+{
+  id:'k8',
+  title:'Rätsel mit Gleichungen',
+  pages:'Knobelstation',
+  icon:'🧠',
+  grad:'linear-gradient(135deg,#fbbf24,#ef4444)',
+  isNew:true,
+  description:`
+    <p>In dieser Station löst du <em>Rätsel</em>, indem du sie als Gleichung aufschreibst und dann rechnest. Lies genau, übersetze die Situation in Mathe — und finde die gesuchte Zahl!</p>
+  `,
+  tasks:[
+    {kind:'Zahlenrätsel', body:`Ich denke mir eine Zahl, verdopple sie und addiere 8. Ich erhalte 24. Welche Zahl habe ich mir gedacht?`, answer:{num:8}, tips:[`Nenne die gesuchte Zahl x. Übersetze „verdoppeln" und „addiere 8" in Mathe.`,`Stelle die Gleichung auf. Welche Zahl musst du zuerst loswerden?`,`Mache die Rechnung rückwärts: Erst die Addition rückgängig, dann die Multiplikation.`], solution:`<span class="math">x = 8</span>. 2x+8=24 → 2x=16 → x=8.`},
+    {kind:'Zahlenrätsel', body:`Eine Zahl wird verfünffacht. Zieht man davon 13 ab, erhält man 42. Welche Zahl ist es?`, answer:{num:11}, tips:[`Nenne die Zahl x. „verfünffacht" heißt: 5 mal x. „13 abziehen" heißt: minus 13.`,`Addiere zuerst die 13 auf beiden Seiten.`,`Teile durch den Vorfaktor.`], solution:`<span class="math">x = 11</span>. 5x=55.`},
+    {kind:'Zahlenrätsel', body:`Das Dreifache einer Zahl ist gleich viel wie die Zahl plus 16. Finde die Zahl.`, answer:{num:8}, tips:[`Nenne die Zahl x. Übersetze: „Das Dreifache" = 3·x, „die Zahl plus 16" = x + 16.`,`Bringe alle x auf eine Seite.`,`Teile durch den Vorfaktor.`], solution:`<span class="math">x = 8</span>. 3x=x+16 → 2x=16.`},
+    {kind:'Altersrätsel', body:`Tom ist 4 Jahre älter als seine Schwester. Zusammen sind sie 28 Jahre alt. Wie alt ist Tom?`, answer:{num:16}, tips:[`Nenne das Alter der Schwester x. Wie alt ist dann Tom?`,`Stelle eine Gleichung auf: Alter Schwester + Alter Tom = 28.`,`Löse die Gleichung. Achtung: Gefragt ist Toms Alter, nicht x!`], solution:`<span class="math">Tom = 16 Jahre</span>. Schwester: 12, Tom: 12+4=16.`},
+    {kind:'Altersrätsel', body:`Mutter ist dreimal so alt wie ihr Sohn. In 10 Jahren ist sie nur noch doppelt so alt. Wie alt ist der Sohn jetzt?`, answer:{num:10}, tips:[`Nenne das Alter des Sohnes x. Wie alt ist die Mutter dann?`,`Übersetze „in 10 Jahren": Beide werden um 10 Jahre älter. Stelle die neue Gleichung auf.`,`Löse die Klammer auf und bringe x auf eine Seite.`], solution:`<span class="math">Sohn = 10 Jahre</span>. 3x+10=2x+20 → x=10.`},
+    {kind:'Geometrie-Rätsel', body:`Ein Rechteck ist dreimal so lang wie breit. Sein Umfang beträgt <span class="math">56 cm</span>. Wie breit ist es?`, answer:{num:7}, tips:[`Nenne die Breite x. Wie drückst du die Länge mit x aus?`,`Umfang = 2 · (Breite + Länge). Stelle die Gleichung auf.`,`Vereinfache und löse nach x auf.`], solution:`<span class="math">Breite = 7 cm</span>. 8x=56.`},
+    {kind:'Bruch-Rätsel', body:`Ich denke mir eine Zahl. Teile ich 30 durch diese Zahl, erhalte ich 6. Welche Zahl ist es?`, hiddenEq:`<span class="math"><span class="frac"><span class="num">30</span><span class="den">x</span></span> = 6</span>`, answer:{num:5}, tips:[`Übersetze: „30 geteilt durch die Zahl = 6". Das ist eine Bruchgleichung!`,`Multipliziere beide Seiten mit x.`,`Teile durch den Vorfaktor.`], solution:`<span class="math">x = 5</span>. 30 : 6 = 5.`},
+    {kind:'Bruch-Rätsel', body:`Teilt man 48 durch eine unbekannte Zahl, zu der ich 2 hinzuaddiere, erhalte ich 6. Finde die Zahl.`, hiddenEq:`<span class="math"><span class="frac"><span class="num">48</span><span class="den">x + 2</span></span> = 6</span>`, answer:{num:6}, tips:[`Übersetze den Text: Was steht im Zähler, was im Nenner?`,`Multipliziere beide Seiten mit dem Nenner.`,`Multipliziere die Klammer aus und löse nach x auf.`], solution:`<span class="math">x = 6</span>. 48 = 6·(x+2) → 36 = 6x.`},
+    {kind:'Knobel-Rätsel', body:`In einer Klasse sind doppelt so viele Mädchen wie Jungen. Insgesamt sind es 27 Schüler. Wie viele Jungen sind es?`, answer:{num:9}, tips:[`Nenne die Anzahl der Jungen x. Wie viele Mädchen gibt es dann?`,`Stelle die Gleichung auf: Jungen + Mädchen = Gesamt.`,`Fasse zusammen und teile durch den Vorfaktor.`], solution:`<span class="math">9 Jungen</span> und 18 Mädchen.`},
+    {kind:'Knobel-Rätsel', body:`Drei aufeinanderfolgende Zahlen ergeben zusammen <span class="math">48</span>. Welche ist die kleinste?`, answer:{num:15}, tips:[`Nenne die kleinste Zahl x. Wie heißen die nächsten zwei?`,`Addiere alle drei Zahlen und setze die Summe gleich 48.`,`Vereinfache die linke Seite und löse nach x auf.`], solution:`<span class="math">15, 16, 17</span>. 3x+3=48 → x=15.`}
+  ],
+  memo:`
+    <h3>Rätsel lösen mit Gleichungen</h3>
+    <p><strong>Schritt 1:</strong> Lies den Text genau. Was ist gesucht? Nenne es x.</p>
+    <p><strong>Schritt 2:</strong> Übersetze die Aussagen in eine Gleichung:</p>
+    <ul>
+      <li>„verdoppeln" → 2·x</li>
+      <li>„3 Jahre älter" → x + 3</li>
+      <li>„dreimal so alt" → 3·x</li>
+      <li>„zusammen 47" → x + y = 47</li>
+      <li>„teilt man 30 durch die Zahl" → <span class="frac"><span class="num">30</span><span class="den">x</span></span></li>
+    </ul>
+    <p><strong>Schritt 3:</strong> Löse die Gleichung und antworte im Sachzusammenhang.</p>
+  `
+},
+{
+  id:'k9',
+  title:'Teste dich!',
+  pages:'Abschluss-Test über alle Stationen',
+  icon:'🏆',
+  grad:'linear-gradient(135deg,#fbbf24,#f97316)',
+  isTest:true,
+  description:`
+    <p>Zeit für den großen Check! In diesem Test kommen Aufgaben aus <em>allen acht Stationen</em>
+    vor. Du bearbeitest sie diesmal <em>alle hintereinander</em> — die Auswertung gibt es erst am
+    Schluss, wenn du auf <em>"Abgeben"</em> klickst.</p>
+    <p>Tipps gibt es in diesem Modus nicht — versuche, dich nur auf das zu verlassen, was du in den
+    Stationen gelernt hast. Viel Erfolg!</p>
+  `,
+  tasks:[
+    {
+      kind:'Station 1 · Wert berechnen',
+      body:`Berechne den Wert von <span class="math">3·x + 7</span> für <span class="math">x = −4</span>.`,
+      answer:{num:-5}
+    },
+    {
+      kind:'Station 1 · Term aufstellen',
+      body:`Lisa hat <span class="math">15 €</span> in der Spardose und legt jede Woche
+      <span class="math">4 €</span> dazu. Stelle einen Term für das Ersparte nach
+      <span class="math">w</span> Wochen auf.`,
+      answer:{term:'15+4*w', compact:'15+4·w', vars:['w']}
+    },
+    {
+      kind:'Station 2 · Vereinfachen',
+      body:`Vereinfache: <span class="math">4 · y + 7 − y + 2 · y − 3</span>`,
+      answer:{term:'5*y+4', compact:'5·y+4', vars:['y']}
+    },
+    {
+      kind:'Station 2 · Geometrie',
+      body:`Stelle einen vereinfachten Term für den <em>Umfang</em> eines Rechtecks mit den
+      Seitenlängen <span class="math">2·a</span> und <span class="math">a + 3</span> auf.`,
+      answer:{term:'6*a+6', compact:'6·a+6', vars:['a']}
+    },
+    {
+      kind:'Station 3 · Ausmultiplizieren',
+      body:`Multipliziere aus: <span class="math">4 · (2·x − 3)</span>`,
+      answer:{term:'8*x-12', compact:'8·x − 12', vars:['x']}
+    },
+    {
+      kind:'Station 3 · Minusklammer',
+      body:`Vereinfache: <span class="math">10 − (2·x + 4)</span>`,
+      answer:{term:'6-2*x', compact:'6 − 2·x', vars:['x']}
+    },
+    {
+      kind:'Station 3 · Ausklammern',
+      body:`Klammere die Zahl 5 aus: <span class="math">15 · x + 25</span>`,
+      answer:['5(3x+5)','5·(3x+5)','5(3·x+5)','5·(3·x+5)','5*(3*x+5)','5·(5+3x)','5·(5+3·x)','5(5+3x)','5(5+3·x)']
+    },
+    {
+      kind:'Station 4 · Lösen',
+      body:`Löse die Gleichung: <span class="math">6 · x − 8 = 22</span>`,
+      answer:{num:5}
+    },
+    {
+      kind:'Station 4 · Sachaufgabe',
+      body:`Eine Pizzeria-Lieferung kostet <span class="math">3,50 €</span> Liefergebühr und
+      <span class="math">8,50 €</span> pro Pizza. Wie viele Pizzen hat man bestellt, wenn die
+      Rechnung <span class="math">29 €</span> beträgt?`,
+      answer:{num:3}
+    },
+    {
+      kind:'Station 5 · Äquivalenz',
+      body:`Löse: <span class="math">7 · x + 5 = 4 · x − 4</span>`,
+      answer:{num:-3}
+    },
+    {
+      kind:'Station 5 · Mit Klammern',
+      body:`Löse: <span class="math">3 · (x − 2) = x + 4</span>`,
+      answer:{num:5}
+    },
+    {
+      kind:'Bruchgleichung',
+      body:`Löse: <span class="math"><span class="frac"><span class="num">24</span><span class="den">x</span></span> = 8</span>`,
+      answer:{num:3}
+    },
+    {
+      kind:'Bruchgleichung · Klammer',
+      body:`Löse: <span class="math"><span class="frac"><span class="num">18</span><span class="den">x + 1</span></span> = 3</span>`,
+      answer:{num:5}
+    },
+    {
+      kind:'Rätsel',
+      body:`Ich denke mir eine Zahl, verdreifache sie und ziehe 7 ab. Ich erhalte 20. Welche Zahl?`,
+      answer:{num:9}
+    }
+  ],
+  memo:`
+    <h3>Du hast es geschafft!</h3>
+    <p>Egal wie viele Punkte am Ende stehen: Wenn du diesen Test gemacht hast, hast du dich durch
+    alle acht Stationen gearbeitet — von einfachen Termen über das Umformen, das Lösen von
+    Gleichungen bis zu Bruchgleichungen und Gleichungs-Rätsel. Das ist eine Menge Stoff für Klasse 7!</p>
+    <p><strong>Was du jetzt tun kannst, falls etwas wackelt:</strong></p>
+    <ul>
+      <li>Schau dir die Aufgaben an, bei denen du nicht sicher warst.</li>
+      <li>Geh zur passenden Station zurück (oben unter dem Aufgabentitel siehst du, woher sie kommt).</li>
+      <li>Lies den Merkkasten dort und übe nochmal die Aufgaben in der Reihenfolge.</li>
+      <li>Komm dann zurück und mach den Test ein zweites Mal — du wirst merken, wie viel besser es läuft.</li>
+    </ul>
+    <p><em>Mathe ist kein Talent, sondern Übung. Jede Aufgabe, die du selbst gelöst hast, hat etwas
+    in deinem Kopf verankert — auch wenn sie sich anfangs schwer anfühlte. Bleib dran! 💪</em></p>
+  `
+}
+];
+
+/* =====================================================================
+   Operator-Highlighting: macht −, +, · und = in allen .math-Elementen
+   farblich klar unterscheidbar. Läuft einmal nach jedem Render.
+   ===================================================================== */
+function highlightMath(root){
+  const els = root.querySelectorAll('.math');
+  for(let i = 0; i < els.length; i++){
+    const el = els[i];
+    if(el.dataset.hi) continue;
+    // Rekursiv nur Textknoten verarbeiten, verschachtelte Elemente (z.B. .frac) erhalten
+    highlightTextNodes(el);
+    el.dataset.hi = '1';
+  }
+}
+function highlightTextNodes(parent){
+  const nodes = Array.from(parent.childNodes);
+  for(let i = 0; i < nodes.length; i++){
+    const node = nodes[i];
+    if(node.nodeType === 1){ // Element-Knoten → rekursiv, aber frac-Inneres nicht anfassen
+      if(!node.classList.contains('num') && !node.classList.contains('den')){
+        highlightTextNodes(node);
+      }
+      continue;
+    }
+    if(node.nodeType !== 3) continue; // Nur Textknoten
+    const text = node.textContent;
+    if(!text || !/[+\-−·*=]/.test(text)) continue;
+    let html = '';
+    for(let k = 0; k < text.length; k++){
+      const ch = text[k];
+      if(ch === '−' || ch === '-'){
+        html += '<span class="op-minus">' + ch + '</span>';
+      } else if(ch === '+'){
+        html += '<span class="op-plus">' + ch + '</span>';
+      } else if(ch === '·' || ch === '*'){
+        html += '<span class="op-times">' + ch + '</span>';
+      } else if(ch === '='){
+        html += '<span class="op-eq">' + ch + '</span>';
+      } else if(ch === '<' || ch === '>' || ch === '&'){
+        html += ch === '<' ? '&lt;' : ch === '>' ? '&gt;' : '&amp;';
+      } else {
+        html += ch;
+      }
+    }
+    const span = document.createElement('span');
+    span.innerHTML = html;
+    parent.replaceChild(span, node);
+  }
+}
+
+/* =====================================================================
+   STATE
+   ===================================================================== */
+const TIP_COOLDOWN_MS = 30 * 1000;
+const state = {};
+let streak = 0;
+let currentChapterId = null;
+
+CHAPTERS.forEach(c => { state[c.id] = { solved:new Set(), tipState:{}, answers:{} }; });
+const totalTasks = CHAPTERS.reduce((s,c) => s + c.tasks.length, 0);
+
+/* =====================================================================
+   GLOBAL TIMER (ein Interval für alle Cooldowns, nur wenn Kapitel offen)
+   ===================================================================== */
+let globalTimer = null;
+function startGlobalTimer(){
+  if(globalTimer) return;
+  globalTimer = setInterval(updateAllCooldowns, 1000);
+}
+function stopGlobalTimer(){
+  if(globalTimer){clearInterval(globalTimer); globalTimer=null}
+}
+function updateAllCooldowns(){
+  if(!currentChapterId) return;
+  const tipState = state[currentChapterId].tipState;
+  const now = Date.now();
+  let anyActive = false;
+  for(const idx in tipState){
+    const ts = tipState[idx];
+    if(ts.tipIndex >= ts.totalTips) continue;
+    const remaining = Math.max(0, ts.lastTipTime + TIP_COOLDOWN_MS - now);
+    const labelEl = document.querySelector(`#task-${idx} .tip-cooldown`);
+    const btnEl = document.querySelector(`#task-${idx} .btn.tip`);
+    if(!labelEl || !btnEl) continue;
+    if(remaining > 0){
+      anyActive = true;
+      btnEl.disabled = true;
+      const m = Math.floor(remaining/60000);
+      const s = Math.floor((remaining%60000)/1000);
+      labelEl.textContent = `nächster Tipp in ${m}:${String(s).padStart(2,'0')}`;
+    } else {
+      btnEl.disabled = false;
+      labelEl.textContent = '';
+    }
+  }
+  if(!anyActive) stopGlobalTimer();
+}
+
+/* =====================================================================
+   HOME-VIEW RENDERING
+   ===================================================================== */
+function buildHome(){
+  document.getElementById('overall-total').textContent = totalTasks;
+  const listEl = document.getElementById('chapter-list');
+  // Einmaliges Rendering — keine teuren Operationen pro Frame
+  let html = '';
+  for(let i = 0; i < CHAPTERS.length; i++){
+    const c = CHAPTERS[i];
+    html += `<button class="chapter-card${c.isNew?' is-new':''}" data-id="${c.id}" style="--grad:${c.grad}">
+      <div class="head">
+        <div class="icon">${c.icon}</div>
+        <div class="meta">
+          <div class="num">${c.isTest ? 'Abschluss' : 'Station '+(i+1)}</div>
+          <h3>${c.title}</h3>
+        </div>
+        <div class="arrow">→</div>
+      </div>
+      ${c.isNew?'<span class="new-badge">Neu</span>':''}
+      <div class="progress">
+        <div class="progress-bar"><span data-bar="${c.id}"></span></div>
+        <div class="progress-text">
+          <span><span class="done" data-done="${c.id}">0</span> von ${c.tasks.length} gelöst</span>
+          <span data-pct="${c.id}">0%</span>
+        </div>
+      </div>
+    </button>`;
+  }
+  listEl.innerHTML = html;
+  // Ein Event-Delegate
+  listEl.addEventListener('click', e => {
+    const card = e.target.closest('.chapter-card');
+    if(card) openChapter(card.dataset.id);
+  });
+  refreshHomeProgress();
+}
+
+function refreshHomeProgress(){
+  let done = 0;
+  for(let i = 0; i < CHAPTERS.length; i++){
+    const c = CHAPTERS[i];
+    const d = state[c.id].solved.size;
+    done += d;
+    const pct = Math.round(d / c.tasks.length * 100);
+    const doneEl = document.querySelector(`[data-done="${c.id}"]`);
+    const barEl = document.querySelector(`[data-bar="${c.id}"]`);
+    const pctEl = document.querySelector(`[data-pct="${c.id}"]`);
+    if(doneEl) doneEl.textContent = d;
+    if(barEl) barEl.style.width = pct + '%';
+    if(pctEl) pctEl.textContent = pct + '%';
+  }
+  document.getElementById('overall-done').textContent = done;
+  document.getElementById('overall-bar').style.width = (done/totalTasks*100) + '%';
+  document.getElementById('streak-count').textContent = streak;
+}
+
+/* =====================================================================
+   KAPITEL-VIEW RENDERING (effizient, mit Event-Delegation)
+   ===================================================================== */
+function openChapter(id){
+  const c = CHAPTERS.find(x => x.id === id);
+  const idx = CHAPTERS.indexOf(c);
+  const isTest = !!c.isTest;
+  currentChapterId = id;
+
+  // Tip-State zurücksetzen für dieses Kapitel
+  state[id].tipState = {};
+
+  // Inhalt komplett als String aufbauen, dann ein einziges innerHTML
+  let tasksHtml = '';
+  for(let ti = 0; ti < c.tasks.length; ti++){
+    const t = c.tasks[ti];
+    const isLocked = false;  // Alle Aufgaben sofort zugänglich
+    const isSolved = !isTest && state[id].solved.has(ti);
+    const cls = 'task' + (isLocked?' locked':'') + (isSolved?' solved':'');
+
+    const equationHtml = t.equation ? `
+      <div class="answer-row">
+        <span class="label">${t.equation.prompt || 'Gleichung'}</span>
+        <input type="text" class="eq-input" placeholder="z.B. 100+5·w=200" autocomplete="off" spellcheck="false">
+        <button class="btn tip eq-check" type="button">Gleichung prüfen</button>
+        <div class="feedback eq-feedback"></div>
+      </div>` : '';
+
+    const controlsHtml = isTest ? '' : `
+      <button class="btn check" ${isSolved?'disabled':''}>Prüfen</button>
+      <button class="btn tip">💡 Tipp</button>
+      <button class="btn solve" disabled>🔓 Lösung</button>`;
+    const cooldownHtml = '';
+    const tipsContainerHtml = isTest ? '' : '<div class="tips"></div><div class="solution"></div>';
+
+    const savedAnswer = state[id].answers[ti];
+    const savedAttr = isSolved && savedAnswer ? ` value="${savedAnswer.replace(/"/g,'&quot;')}"` : '';
+
+    tasksHtml += `<div class="${cls}" id="task-${ti}" data-idx="${ti}" style="--grad:${c.grad}">
+      <div class="task-head">
+        <div class="task-num">${ti+1}</div>
+        <div class="task-kind">${t.kind}</div>
+      </div>
+      <div class="task-body">${t.body}</div>
+      ${t.hiddenEq ? `<div class="eq-reveal"><button class="btn-reveal" type="button">👁 Gleichung anzeigen</button></div>` : ''}
+      <div class="answer-area">
+        ${equationHtml}
+        <div class="answer-row">
+          <span class="label">${t.equation ? 'Dein Ergebnis (Wert der Variablen)' : 'Dein Ergebnis'}</span>
+          <input type="text" class="ans-input${isSolved?' good':''}" placeholder="hier eintippen…" autocomplete="off" spellcheck="false"${savedAttr} ${isSolved?'disabled':''}>
+          ${controlsHtml}
+          <div class="feedback${isSolved?' ok':''}">${isSolved?'✓ Richtig! Stark gemacht.':''}</div>
+          ${cooldownHtml}
+        </div>
+        <div class="long-hint"></div>
+        ${tipsContainerHtml}
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('chapter-content').innerHTML = `
+    <div class="chapter-hero" style="--grad:${c.grad}">
+      <div class="hero-head">
+        <div class="icon">${c.icon}</div>
+        <div>
+          <div class="num">${isTest ? 'Abschluss' : 'Station '+(idx+1)}</div>
+          <h2>${c.title}</h2>
+          <div class="pages">${c.pages}</div>
+        </div>
+      </div>
+      <div class="desc">${c.description}</div>
+    </div>
+
+    <div class="tasks-header">
+      <h3><span class="dot" style="background:${c.grad}"></span>${isTest ? 'Test-Aufgaben' : 'Aufgaben'}</h3>
+      <div class="counter"><span id="ch-counter">${state[id].solved.size}</span> / ${c.tasks.length}</div>
+    </div>
+
+    <div class="task-list" id="task-list">${tasksHtml}</div>
+
+    ${isTest ? `
+      <button class="btn check submit-test" id="submit-test">✅ Test abgeben &amp; auswerten</button>
+      <div class="test-result" id="test-result"></div>
+    ` : ''}
+
+    <div class="complete-banner" id="complete-banner">
+      <span class="emoji">🎉</span>
+      <h4>${isTest ? 'Test abgeschlossen!' : 'Station gemeistert!'}</h4>
+      <p>${isTest ? 'Sieh dir dein Ergebnis an und schau, was du nochmal vertiefen kannst.' : 'Alle Aufgaben gelöst. Schau dir den Merkkasten unten an.'}</p>
+    </div>
+
+    <div class="memo">
+      <span class="badge">${isTest ? '🎓 Geschafft' : '📌 Merken'}</span>
+      ${c.memo}
+    </div>
+  `;
+
+  // EIN Event-Delegate für die ganze Task-Liste — viel schneller als pro Aufgabe
+  const listEl = document.getElementById('task-list');
+  listEl.addEventListener('click', e => handleTaskClick(e, id, c, isTest));
+  listEl.addEventListener('keydown', e => {
+    if(e.key !== 'Enter') return;
+    if(e.target.classList.contains('ans-input')){
+      e.preventDefault();
+      if(!isTest){
+        const taskEl = e.target.closest('.task');
+        if(taskEl) doCheckTask(taskEl, id, c);
+      }
+    } else if(e.target.classList.contains('eq-input')){
+      e.preventDefault();
+      const taskEl = e.target.closest('.task');
+      if(taskEl) doCheckEquation(taskEl, c);
+    }
+  });
+
+  if(isTest){
+    document.getElementById('submit-test').addEventListener('click', () => submitTest(id, c));
+  }
+
+  // Operatoren in allen .math-Elementen farblich hervorheben
+  highlightMath(document.getElementById('chapter-content'));
+
+  // View wechseln
+  document.getElementById('view-home').classList.remove('active');
+  document.getElementById('view-chapter').classList.add('active');
+  window.scrollTo({top:0});
+}
+
+function handleTaskClick(e, id, c, isTest){
+  const target = e.target;
+  if(target.classList.contains('check') && !target.classList.contains('submit-test')){
+    const taskEl = target.closest('.task');
+    if(taskEl) doCheckTask(taskEl, id, c);
+    return;
+  }
+  if(target.classList.contains('eq-check')){
+    const taskEl = target.closest('.task');
+    if(taskEl) doCheckEquation(taskEl, c);
+    return;
+  }
+  if(target.classList.contains('tip') && !target.classList.contains('eq-check')){
+    const taskEl = target.closest('.task');
+    if(taskEl) showTip(taskEl, id, c);
+    return;
+  }
+  if(target.classList.contains('btn-reveal')){
+    const taskEl = target.closest('.task');
+    const ti = parseInt(taskEl.dataset.idx, 10);
+    const t = c.tasks[ti];
+    if(t && t.hiddenEq){
+      const container = target.closest('.eq-reveal');
+      container.innerHTML = `<div class="eq-content">${t.hiddenEq}</div>`;
+      highlightMath(container);
+    }
+    return;
+  }
+  if(target.classList.contains('solve')){
+    const taskEl = target.closest('.task');
+    if(taskEl) showSolution(taskEl, id, c);
+    return;
+  }
+  if(target.classList.contains('show-steps')){
+    const hint = target.closest('.long-hint-box');
+    const stepsList = hint.querySelector('.steps-list');
+    if(stepsList.hasAttribute('hidden')){
+      stepsList.removeAttribute('hidden');
+      target.textContent = 'Schritte ausblenden';
+    } else {
+      stepsList.setAttribute('hidden','');
+      target.textContent = 'Schritte anzeigen';
+    }
+    return;
+  }
+}
+
+function doCheckEquation(taskEl, c){
+  const ti = parseInt(taskEl.dataset.idx, 10);
+  const t = c.tasks[ti];
+  if(!t.equation) return;
+  const eqInput = taskEl.querySelector('.eq-input');
+  const eqFb = taskEl.querySelector('.eq-feedback');
+  const val = eqInput.value.trim();
+  if(!val){
+    eqFb.textContent = 'Bitte trage eine Gleichung ein.';
+    eqFb.className = 'feedback eq-feedback bad';
+    return;
+  }
+  if(val.indexOf('=') < 0){
+    eqFb.textContent = 'Eine Gleichung braucht ein "=" Zeichen.';
+    eqFb.className = 'feedback eq-feedback bad';
+    eqInput.classList.add('bad');
+    return;
+  }
+  const parts = val.split('=');
+  const lhs = parts[0], rhs = parts[1];
+  const combined = `(${lhs})-(${rhs})`;
+  const flipped = `(${rhs})-(${lhs})`;
+  const vars = t.equation.answer.vars;
+  if(termsEquivalentFlexible(combined, t.equation.answer.term, vars) ||
+     termsEquivalentFlexible(flipped, t.equation.answer.term, vars)){
+    eqFb.textContent = '✓ Gleichung ist richtig!';
+    eqFb.className = 'feedback eq-feedback ok';
+    eqInput.classList.remove('bad');
+    eqInput.classList.add('good');
+  } else {
+    eqFb.textContent = 'Die Gleichung passt noch nicht. Schau nochmal: was ist gleich viel?';
+    eqFb.className = 'feedback eq-feedback bad';
+    eqInput.classList.add('bad');
+    eqInput.classList.remove('good');
+  }
+}
+
+function showTip(taskEl, id, c){
+  const ti = parseInt(taskEl.dataset.idx, 10);
+  const t = c.tasks[ti];
+  if(!t.tips) return;
+
+  // Tip-State pro Aufgabe initialisieren
+  if(!state[id].tipState[ti]){
+    state[id].tipState[ti] = { tipIndex:0, lastTipTime:0, totalTips:t.tips.length };
+  }
+  const ts = state[id].tipState[ti];
+  if(ts.tipIndex >= ts.totalTips) return;
+
+  const tipsEl = taskEl.querySelector('.tips');
+  const box = document.createElement('div');
+  box.className = 'tip-box';
+  box.innerHTML = `<span class="label">Tipp ${ts.tipIndex+1}</span>${t.tips[ts.tipIndex]}`;
+  tipsEl.appendChild(box);
+  ts.tipIndex++;
+
+  const tipBtn = taskEl.querySelector('.btn.tip:not(.eq-check)');
+  if(ts.tipIndex >= ts.totalTips){
+    tipBtn.disabled = true;
+    const solveBtn = taskEl.querySelector('.btn.solve');
+    if(solveBtn) solveBtn.disabled = false;
+  }
+}
+
+function showSolution(taskEl, id, c){
+  const ti = parseInt(taskEl.dataset.idx, 10);
+  const t = c.tasks[ti];
+  if(!t.solution) return;
+  const solEl = taskEl.querySelector('.solution');
+  if(!solEl || solEl.innerHTML) return;
+
+  // Solution-Text in Antwort + Erklärung aufteilen
+  // Heuristik: Erste <span class="math">...</span> ist die Hauptantwort
+  // Rest nach dem ersten ". " ist die Erklärung
+  let solText = t.solution;
+  let answerPart = '';
+  let explainPart = '';
+
+  // Versuche am ersten ". " zu splitten (nach dem die Antwort endet)
+  const dotPos = solText.search(/\.\s+(?=[A-ZÄÖÜ„\d])/);
+  if(dotPos >= 0){
+    answerPart = solText.substring(0, dotPos + 1);
+    explainPart = solText.substring(dotPos + 1).trim();
+  } else {
+    // Kein guter Split-Punkt → alles ist die Antwort
+    answerPart = solText;
+  }
+
+  // "Rechnung:" Prefix in der Erklärung entfernen (redundant)
+  explainPart = explainPart.replace(/^Rechnung:\s*|^Rechenweg:\s*/i, '');
+
+  // Erklärungsschritte bei " → " oder "; " oder ". " aufteilen
+  let explainHtml = '';
+  if(explainPart){
+    const steps = explainPart.split(/\s*→\s*|;\s+|(?<=\.)\s+/).filter(s => s.trim());
+    explainHtml = steps.map(s =>
+      '<div class="step"><span class="step-arrow">→</span><span>' + s.trim() + '</span></div>'
+    ).join('');
+  }
+
+  solEl.innerHTML = `<div class="solution-box">
+    <div class="sol-header">
+      <div class="sol-icon">💡</div>
+      <div class="sol-title">Lösung</div>
+    </div>
+    <div class="sol-answer">${answerPart}</div>
+    ${explainHtml ? '<div class="sol-explain">' + explainHtml + '</div>' : ''}
+  </div>`;
+  highlightMath(solEl);
+
+  if(!state[id].solved.has(ti)){
+    state[id].solved.add(ti);
+    state[id].answers[ti] = '(Lösung angeschaut)';
+    taskEl.classList.add('solved');
+    document.getElementById('ch-counter').textContent = state[id].solved.size;
+    refreshHomeProgress();
+    const next = document.getElementById('task-' + (ti+1));
+    if(next){
+      next.classList.remove('locked');
+      setTimeout(() => next.scrollIntoView({behavior:'smooth', block:'center'}), 300);
+    }
+  }
+}
+
+function doCheckTask(taskEl, id, c){
+  const ti = parseInt(taskEl.dataset.idx, 10);
+  const t = c.tasks[ti];
+  const input = taskEl.querySelector('.ans-input');
+  const feedback = taskEl.querySelector('.feedback:not(.eq-feedback)');
+  const val = input.value;
+  if(!val.trim()) return;
+  input.classList.remove('good','bad');
+  const result = checkAnswer(val, t.answer);
+  if(result.ok){
+    input.classList.add('good');
+    input.disabled = true;
+    const checkBtn = taskEl.querySelector('.btn.check');
+    if(checkBtn) checkBtn.disabled = true;
+    feedback.textContent = '✓ Richtig! Stark gemacht.';
+    feedback.className = 'feedback ok';
+    taskEl.classList.add('solved','just-solved');
+    state[id].solved.add(ti);
+    state[id].answers[ti] = val;
+    streak++;
+    document.getElementById('ch-counter').textContent = state[id].solved.size;
+    refreshHomeProgress();
+    confettiBurst(taskEl);
+
+    // Long-Hint anzeigen
+    if(result.longHint && result.steps){
+      const longHintEl = taskEl.querySelector('.long-hint');
+      const stepsHtml = result.steps.map((s,i) =>
+        `<div class="step-item"><span class="step-num">${i+1}</span><span>${s}</span></div>`
+      ).join('');
+      longHintEl.innerHTML = `<div class="long-hint-box">
+        <div class="long-hint-head">
+          <span class="long-hint-icon">✨</span>
+          <span><strong>Richtig — kann man das noch kompakter schreiben?</strong><br>
+          Du hast es ausführlich angegeben. Die kürzere Form lautet:
+          <span class="math">${result.compact}</span></span>
+        </div>
+        <button class="btn tip show-steps" type="button">Schritte anzeigen</button>
+        <div class="steps-list" hidden>${stepsHtml}</div>
+      </div>`;
+    }
+
+    // Nächste Aufgabe freischalten
+    const next = document.getElementById('task-' + (ti+1));
+    if(next){
+      next.classList.remove('locked');
+      setTimeout(() => {
+        const nextInput = next.querySelector('.ans-input');
+        if(nextInput) nextInput.focus({preventScroll:false});
+        next.scrollIntoView({behavior:'smooth', block:'center'});
+      }, 300);
+    } else {
+      if(state[id].solved.size === c.tasks.length){
+        const banner = document.getElementById('complete-banner');
+        banner.classList.add('show');
+        setTimeout(()=>banner.scrollIntoView({behavior:'smooth',block:'center'}), 350);
+      }
+    }
+  } else {
+    input.classList.add('bad');
+    feedback.textContent = 'Noch nicht — probier es nochmal!';
+    feedback.className = 'feedback bad';
+    streak = 0;
+    document.getElementById('streak-count').textContent = streak;
+  }
+}
+
+function submitTest(id, c){
+  let correct = 0;
+  const taskEls = document.querySelectorAll('#task-list .task');
+  const detail = [];
+  taskEls.forEach((el, i) => {
+    const t = c.tasks[i];
+    const inp = el.querySelector('.ans-input');
+    const fb = el.querySelector('.feedback:not(.eq-feedback)');
+    const val = inp.value;
+    inp.disabled = true;
+    if(val.trim() && checkAnswer(val, t.answer).ok){
+      correct++;
+      inp.classList.add('good');
+      fb.textContent = '✓ Richtig';
+      fb.className = 'feedback ok';
+      el.classList.add('solved');
+      detail.push({i:i+1, kind:t.kind, ok:true});
+    } else {
+      inp.classList.add('bad');
+      fb.textContent = val.trim() ? '✗ Leider falsch' : '✗ Keine Antwort';
+      fb.className = 'feedback bad';
+      detail.push({i:i+1, kind:t.kind, ok:false});
+    }
+  });
+  const submitBtn = document.getElementById('submit-test');
+  submitBtn.disabled = true;
+  submitBtn.textContent = '✓ Test abgegeben';
+  const total = c.tasks.length;
+  const pct = Math.round(correct/total*100);
+  let emoji = '🌱', label = 'Übe nochmal in den Stationen';
+  if(pct >= 90){emoji='🏆'; label='Phänomenal — du beherrschst den Stoff!'}
+  else if(pct >= 75){emoji='🌟'; label='Sehr gut! Nur Feinschliff fehlt.'}
+  else if(pct >= 50){emoji='💪'; label='Solide Basis — schau dir die Fehler nochmal an.'}
+  const wrongList = detail.filter(d=>!d.ok);
+  document.getElementById('test-result').innerHTML = `
+    <div class="test-summary">
+      <div class="ts-emoji">${emoji}</div>
+      <div class="ts-score">${correct} / ${total}</div>
+      <div class="ts-pct">${pct}% richtig</div>
+      <div class="ts-label">${label}</div>
+      ${wrongList.length ? `
+        <div class="ts-wrong">
+          <strong>Diese Aufgaben solltest du nochmal anschauen:</strong>
+          <ul>${wrongList.map(d => `<li>Aufgabe ${d.i}: <em>${d.kind}</em></li>`).join('')}</ul>
+        </div>
+      ` : '<p style="margin-top:14px">Alle richtig — Wahnsinn! 🎉</p>'}
+    </div>
+  `;
+  if(correct === total){
+    for(let i = 0; i < total; i++) state[id].solved.add(i);
+  }
+  refreshHomeProgress();
+  document.getElementById('complete-banner').classList.add('show');
+  setTimeout(()=>document.getElementById('test-result').scrollIntoView({behavior:'smooth',block:'center'}), 350);
+  if(pct >= 75) confettiBurst(submitBtn, 60);
+}
+
+function goHome(){
+  stopGlobalTimer();
+  currentChapterId = null;
+  document.getElementById('view-chapter').classList.remove('active');
+  document.getElementById('view-home').classList.add('active');
+  // Inhalt freigeben (verhindert dass alte DOM-Bäume im Speicher bleiben)
+  document.getElementById('chapter-content').innerHTML = '';
+  window.scrollTo({top:0});
+  refreshHomeProgress();
+}
+
+document.getElementById('back-btn').addEventListener('click', goHome);
+
+/* =====================================================================
+   CONFETTI auf Canvas (eine Animation für alle Partikel)
+   ===================================================================== */
+const canvas = document.getElementById('confetti-canvas');
+const ctx = canvas.getContext('2d');
+let confettiParticles = [];
+let confettiRunning = false;
+
+function resizeCanvas(){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas, {passive:true});
+
+function confettiBurst(originEl, count){
+  const rect = originEl.getBoundingClientRect();
+  const cx = rect.left + rect.width/2;
+  const cy = rect.top + 20;
+  const colors = ['#a855f7','#ec4899','#22d3ee','#fbbf24','#34d399'];
+  const n = count || 18;
+  for(let i = 0; i < n; i++){
+    confettiParticles.push({
+      x: cx + (Math.random()-0.5)*rect.width*0.6,
+      y: cy,
+      vx: (Math.random()-0.5)*4,
+      vy: -Math.random()*4 - 2,
+      g: 0.18,
+      size: 4 + Math.random()*4,
+      color: colors[(Math.random()*colors.length)|0],
+      rot: Math.random()*Math.PI*2,
+      vr: (Math.random()-0.5)*0.2,
+      life: 0
+    });
+  }
+  if(!confettiRunning){
+    confettiRunning = true;
+    requestAnimationFrame(animateConfetti);
+  }
+}
+
+function animateConfetti(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for(let i = confettiParticles.length-1; i >= 0; i--){
+    const p = confettiParticles[i];
+    p.vy += p.g;
+    p.x += p.vx;
+    p.y += p.vy;
+    p.rot += p.vr;
+    p.life++;
+    if(p.y > canvas.height + 20 || p.life > 200){
+      confettiParticles.splice(i,1);
+      continue;
+    }
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rot);
+    ctx.fillStyle = p.color;
+    ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+    ctx.restore();
+  }
+  if(confettiParticles.length > 0){
+    requestAnimationFrame(animateConfetti);
+  } else {
+    confettiRunning = false;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+}
+
+/* ===================================================================== */
+buildHome();
+</script>
+</body>
+</html>
